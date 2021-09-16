@@ -26,10 +26,14 @@ func (s StartGame) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	}
 	game, err = s.Command.CallStartGame(ctx, game)
 	if err != nil {
+		return nil, err
+	}
+	result, err := s.Encoding.EncodeStartGame(game)
+	if err != nil {
 		logger.Errorf(ctx, "could not encode start game response %#v: %s", game, err)
 		return nil, poc.Error{Actual: errors.New("could not encode response"), Category: poc.UnknownError}
 	}
-	return s.Encoding.EncodeStartGame(game)
+	return result, nil
 }
 
 type PerformMoveEncoding interface {
@@ -49,10 +53,14 @@ func (p PerformMove) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	}
 	move, err = p.Command.CallPerformMove(ctx, move)
 	if err != nil {
+		return nil, err
+	}
+	result, err := p.Encoding.EncodePerformMove(move)
+	if err != nil {
 		logger.Errorf(ctx, "could not encode perform move response %#v: %s", move, err)
 		return nil, poc.Error{Actual: errors.New("could not encode response"), Category: poc.UnknownError}
 	}
-	return p.Encoding.EncodePerformMove(move)
+	return result, nil
 }
 
 type ListGamesEncoding interface {
@@ -72,8 +80,12 @@ func (l ListGames) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	}
 	list, err = l.Command.CallListGames(ctx, list)
 	if err != nil {
+		return nil, err
+	}
+	result, err := l.Encoding.EncodeListGames(list)
+	if err != nil {
 		logger.Errorf(ctx, "could not encode list games response %#v: %s", list, err)
 		return nil, poc.Error{Actual: errors.New("could not encode response"), Category: poc.UnknownError}
 	}
-	return l.Encoding.EncodeListGames(list)
+	return result, nil
 }

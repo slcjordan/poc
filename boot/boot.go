@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
 
 	"github.com/slcjordan/poc/config"
@@ -25,8 +26,10 @@ func mustConnect(connString string) *pgxpool.Pool {
 	}
 	logger.Infof(
 		context.Background(),
-		"connected to %#v on port %d",
-		conn.Config().ConnConfig.Config.Host, conn.Config().ConnConfig.Config.Port,
+		"connected to %#v database on host %#v and port %d",
+		conn.Config().ConnConfig.Config.Database,
+		conn.Config().ConnConfig.Config.Host,
+		conn.Config().ConnConfig.Config.Port,
 	)
 	return conn
 }
@@ -65,7 +68,9 @@ func APIServer() http.Handler {
 				search,
 			},
 		},
-	})
+	},
+		middleware.Logger,
+	)
 	return mux
 }
 
