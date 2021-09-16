@@ -14,6 +14,18 @@ PGUSER?=poc
 DB_CONN_STRING?=postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}
 HTTP_LISTEN_ADDRESS?=0.0.0.0:8321
 
+.PHONY: run-docs
+run-docs:
+	echo 'once running, please visit http://localhost:8411/pkg/github.com/slcjordan/poc/ for documentation'
+	docker run \
+		--interactive \
+		--tty \
+		--network poc-demo \
+		--publish 8411:8411 \
+		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
+		--workdir /go/src/github.com/slcjordan/poc/cmd/api \
+		golang:${GO_VERSION} sh -c 'go get -v  golang.org/x/tools/cmd/godoc && godoc -http=:8411'
+
 .PHONY: generate
 generate: build/.empty-targets/generate
 

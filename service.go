@@ -30,14 +30,17 @@ type SavedGameDetail struct {
 	Variant           Variant
 }
 
+// StartGameCaller is a start game command.
 type StartGameCaller interface {
 	CallStartGame(context.Context, StartGame) (StartGame, error)
 }
 
+// PerformMoveCaller is a perform move command.
 type PerformMoveCaller interface {
 	CallPerformMove(context.Context, PerformMove) (PerformMove, error)
 }
 
+// ListGamesCaller is a list game command.
 type ListGamesCaller interface {
 	CallListGames(context.Context, ListGames) (ListGames, error)
 }

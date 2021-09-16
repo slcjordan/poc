@@ -10,10 +10,12 @@ import (
 	"github.com/slcjordan/poc/logger"
 )
 
+// Search uses search parameters to find multiple results.
 type Search struct {
 	Pool *pgxpool.Pool
 }
 
+// CallListGame has a default ordering by game id.
 func (s *Search) CallListGames(ctx context.Context, list poc.ListGames) (poc.ListGames, error) {
 	conn, err := s.Pool.Acquire(ctx)
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	"github.com/slcjordan/poc"
 )
 
+// InvalidMove means the user tried a bad move.
 var InvalidMove = errors.New("invalid move")
 
 func nextMoves(
@@ -240,8 +241,10 @@ func (s *sortable) Swap(i int, j int) {
 	[]poc.Move(*s)[i], []poc.Move(*s)[j] = []poc.Move(*s)[j], []poc.Move(*s)[i]
 }
 
+// Validate validates command input.
 type Validate struct{}
 
+// CallPerformMove checks that the move can actually be performed.
 func (v Validate) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.PerformMove, error) {
 	// get list of possible moves
 	possible := nextMoves(
@@ -268,17 +271,19 @@ func (v Validate) CallPerformMove(ctx context.Context, move poc.PerformMove) (po
 		return (&a).Compare(&input) >= 0
 	})
 	if result >= len(possible) {
-		return move, poc.Error{InvalidMove, poc.SemanticError}
+		return move, poc.Error{Actual: InvalidMove, Category: poc.SemanticError}
 	}
 	target := sortable(possible[result])
 	if (&target).Compare(&input) != 0 {
-		return move, poc.Error{InvalidMove, poc.SemanticError}
+		return move, poc.Error{Actual: InvalidMove, Category: poc.SemanticError}
 	}
 	return move, nil
 }
 
+// NextMove hydrates next move in result with the next reachable moves.
 type NextMove struct{}
 
+// CallStartGame moves.
 func (n NextMove) CallStartGame(ctx context.Context, game poc.StartGame) (poc.StartGame, error) {
 	game.Result.PossibleNextMoves = nextMoves(
 		game.Result.Board.Piles[0],
@@ -289,6 +294,7 @@ func (n NextMove) CallStartGame(ctx context.Context, game poc.StartGame) (poc.St
 	return game, nil
 }
 
+// CallPerformMove moves.
 func (n NextMove) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.PerformMove, error) {
 	move.Result.PossibleNextMoves = nextMoves(
 		move.Result.Board.Piles[0],
@@ -299,8 +305,10 @@ func (n NextMove) CallPerformMove(ctx context.Context, move poc.PerformMove) (po
 	return move, nil
 }
 
+// Shuffle shuffles the deck.
 type Shuffle struct{ Source rand.Source }
 
+// CallStartGame shuffles a new deck and deals it to the result.Board piles.
 func (s Shuffle) CallStartGame(ctx context.Context, game poc.StartGame) (poc.StartGame, error) {
 	cards := make([]poc.PositionedCard, 52)
 

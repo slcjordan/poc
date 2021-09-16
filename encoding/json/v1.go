@@ -100,8 +100,10 @@ func toV1SavedGame(saved poc.SavedGameDetail) v1SavedGameDetail {
 	}
 }
 
+// V1 json encoding.
 type V1 struct{}
 
+// DecodeStartGame unmarshals start game input.
 func (v V1) DecodeStartGame(b []byte) (poc.StartGame, error) {
 	var variant v1Variant
 	err := json.Unmarshal(b, &variant)
@@ -115,11 +117,13 @@ func (v V1) DecodeStartGame(b []byte) (poc.StartGame, error) {
 	}, nil
 }
 
+// EncodeStartGame marshals start game result.
 func (v V1) EncodeStartGame(started poc.StartGame) ([]byte, error) {
 	result := toV1SavedGame(started.Result)
 	return json.Marshal(result)
 }
 
+// DecodePerformMove unmarshals perform move input.
 func (v V1) DecodePerformMove(b []byte) (poc.PerformMove, error) {
 	var jsonMoves []v1Move
 	err := json.Unmarshal(b, &jsonMoves)
@@ -141,16 +145,19 @@ func (v V1) DecodePerformMove(b []byte) (poc.PerformMove, error) {
 	return result, nil
 }
 
+// EncodePerformMove marshals perform move result.
 func (v V1) EncodePerformMove(performed poc.PerformMove) ([]byte, error) {
 	result := toV1SavedGame(performed.Result)
 	return json.Marshal(result)
 }
 
+// DecodeListGames unmarshals list games input.
 func (v V1) DecodeListGames(b []byte) (poc.ListGames, error) {
 	var result poc.ListGames
 	return result, nil
 }
 
+// EncodeListGames marshals list games result.
 func (v V1) EncodeListGames(list poc.ListGames) ([]byte, error) {
 	result := make([]struct {
 		GameID int64 `json:"game_id"`

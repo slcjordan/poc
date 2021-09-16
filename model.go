@@ -64,6 +64,7 @@ type Board struct {
 	Score int32
 }
 
+// Variant is a rules variant.
 type Variant struct {
 	MaxTimesThroughDeck int32
 }

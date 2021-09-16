@@ -22,6 +22,7 @@ const (
 	gameIDKey = "gameID"
 )
 
+// A ByteCaller processes request bodies and returns response bodies.
 type ByteCaller interface {
 	CallBytes(context.Context, []byte) ([]byte, error)
 }
@@ -31,6 +32,7 @@ type Mux struct {
 	router *chi.Mux
 }
 
+// V1Handlers members must not be nil.
 type V1Handlers struct {
 	StartGame   ByteCaller
 	PerformMove ByteCaller
@@ -51,6 +53,7 @@ func (mux *Mux) Use(
 	mux.router.Use(middlewares...)
 }
 
+// RegisterRoutesV1 sets up v1 routes with passed middleware.
 func (mux *Mux) RegisterRoutesV1(
 	handlers V1Handlers,
 	middlewares ...func(http.Handler) http.Handler,
@@ -106,11 +109,13 @@ func handlerFunc(f ByteCaller) http.HandlerFunc {
 	}
 }
 
+// V1HydrateURLAndQueryParams adds url path and query params from context to data.
 type V1HydrateURLAndQueryParams struct {
 	OffsetKey string
 	LimitKey  string
 }
 
+// CallPerformMove adds move.Input.GameID url path param.
 func (params V1HydrateURLAndQueryParams) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.PerformMove, error) {
 	gameID := chi.URLParamFromCtx(ctx, gameIDKey)
 	var err error
@@ -118,6 +123,7 @@ func (params V1HydrateURLAndQueryParams) CallPerformMove(ctx context.Context, mo
 	return move, poc.Error{Actual: err, Category: poc.MalformedError}
 }
 
+// CallListGames adds list.Input.Limit and list.Input.Offset url query param.
 func (params V1HydrateURLAndQueryParams) CallListGames(ctx context.Context, cursor poc.ListGames) (poc.ListGames, error) {
 	values := ctx.Value(query).(url.Values)
 	offset, err := strconv.ParseInt(values.Get(params.OffsetKey), 10, 32)

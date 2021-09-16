@@ -12,12 +12,15 @@ func init() {
 
 type parser struct{}
 
+// ParseConfig uses non-empty environment variables.
 func (p parser) ParseConfig() error {
-	if config.DB.ShouldParse {
-		config.DB.ConnString = os.Getenv("DB_CONN_STRING")
+	connString := os.Getenv("DB_CONN_STRING")
+	if config.DB.ShouldParse && connString != "" {
+		config.DB.ConnString = connString
 	}
-	if config.HTTP.ShouldParse {
-		config.HTTP.ListenAddress = os.Getenv("HTTP_LISTEN_ADDRESS")
+	listenAddress := os.Getenv("HTTP_LISTEN_ADDRESS")
+	if config.HTTP.ShouldParse && listenAddress != "" {
+		config.HTTP.ListenAddress = listenAddress
 	}
 	return nil
 }

@@ -9,16 +9,20 @@ import (
 	"github.com/slcjordan/poc/logger"
 )
 
+// StartGameEncoding may deserialize a startGame input and serialize a
+// startGame result.
 type StartGameEncoding interface {
 	EncodeStartGame(poc.StartGame) ([]byte, error)
 	DecodeStartGame([]byte) (poc.StartGame, error)
 }
 
+// StartGame command turns a startGame command (usually a pipeline) into a []byte command.
 type StartGame struct {
 	Encoding StartGameEncoding
 	Command  poc.StartGameCaller
 }
 
+// CallBytes forwards parsed bytes to the StartGame command.
 func (s StartGame) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	game, err := s.Encoding.DecodeStartGame(b)
 	if err != nil {
@@ -36,16 +40,20 @@ func (s StartGame) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	return result, nil
 }
 
+// PerformMoveEncoding may deserialize a performMove input and serialize a
+// performMove result.
 type PerformMoveEncoding interface {
 	EncodePerformMove(poc.PerformMove) ([]byte, error)
 	DecodePerformMove([]byte) (poc.PerformMove, error)
 }
 
+// PerformMove command turns a performMove command (usually a pipeline) into a []byte command.
 type PerformMove struct {
 	Encoding PerformMoveEncoding
 	Command  poc.PerformMoveCaller
 }
 
+// CallBytes forwards parsed bytes to the PerformMove command.
 func (p PerformMove) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	move, err := p.Encoding.DecodePerformMove(b)
 	if err != nil {
@@ -63,16 +71,20 @@ func (p PerformMove) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	return result, nil
 }
 
+// ListGamesEncoding may deserialize a listGames input and serialize a
+// listGames result.
 type ListGamesEncoding interface {
 	EncodeListGames(poc.ListGames) ([]byte, error)
 	DecodeListGames([]byte) (poc.ListGames, error)
 }
 
+// ListGames command turns a listGames command (usually a pipeline) into a []byte command.
 type ListGames struct {
 	Encoding ListGamesEncoding
 	Command  poc.ListGamesCaller
 }
 
+// CallBytes forwards parsed bytes to the ListGames command.
 func (l ListGames) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	list, err := l.Encoding.DecodeListGames(b)
 	if err != nil {

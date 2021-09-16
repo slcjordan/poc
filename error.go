@@ -1,7 +1,10 @@
 package poc
 
+// An ErrorCategory must be at least detailed enough to only correspond to a
+// single http status code, but may be broken down further (one-to-many).
 type ErrorCategory uint8
 
+// supported error categories
 const (
 	_ ErrorCategory = iota
 	SemanticError
@@ -12,6 +15,7 @@ const (
 	UnknownError
 )
 
+// Error wraps an existing error and assigns it a category.
 type Error struct {
 	Actual   error
 	Category ErrorCategory

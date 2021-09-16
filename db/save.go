@@ -10,10 +10,12 @@ import (
 	"github.com/slcjordan/poc/logger"
 )
 
+// Save commands create or update data.
 type Save struct {
 	Pool *pgxpool.Pool
 }
 
+// CallStartGame saves start.Result as a new game.
 func (s *Save) CallStartGame(ctx context.Context, start poc.StartGame) (poc.StartGame, error) {
 	conn, err := s.Pool.Acquire(ctx)
 	if err != nil {
@@ -34,6 +36,7 @@ func (s *Save) CallStartGame(ctx context.Context, start poc.StartGame) (poc.Star
 	return start, nil
 }
 
+// CallPerformMove updates start.Result as an existing game and expects move.Input.GameID to be set.
 func (s *Save) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.PerformMove, error) {
 	conn, err := s.Pool.Acquire(ctx)
 	if err != nil {

@@ -10,10 +10,12 @@ import (
 	"github.com/slcjordan/poc/logger"
 )
 
+// Lookup commands fetch data using a primary key passed in by the caller.
 type Lookup struct {
 	Pool *pgxpool.Pool
 }
 
+// CallPerformMove expects move.Input.GameID to be set.
 func (l *Lookup) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.PerformMove, error) {
 	conn, err := l.Pool.Acquire(ctx)
 	if err != nil {

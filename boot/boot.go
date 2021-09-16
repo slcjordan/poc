@@ -22,7 +22,8 @@ import (
 func mustConnect(connString string) *pgxpool.Pool {
 	conn, err := pgxpool.Connect(context.Background(), connString)
 	if err != nil {
-		logger.Fatalf(context.Background(), "could not connect: %s", err)
+		logger.Errorf(context.Background(), "could not connect: %s", err)
+		panic(err)
 	}
 	logger.Infof(
 		context.Background(),
@@ -34,6 +35,7 @@ func mustConnect(connString string) *pgxpool.Pool {
 	return conn
 }
 
+// APIServer connects to database; sets up routes and handlers.
 func APIServer() http.Handler {
 	mux := router.NewMux()
 	v1HydrateParams := router.V1HydrateURLAndQueryParams{OffsetKey: "offset", LimitKey: "limit"}
@@ -74,6 +76,7 @@ func APIServer() http.Handler {
 	return mux
 }
 
+// MustServe serves the api server and fatally exits on error.
 func MustServe() {
 	config.DB.ShouldParse = true
 	config.HTTP.ShouldParse = true
@@ -82,6 +85,7 @@ func MustServe() {
 	logger.Infof(context.Background(), "Listening at %#v", config.HTTP.ListenAddress)
 	err := http.ListenAndServe(config.HTTP.ListenAddress, APIServer())
 	if err != nil {
-		logger.Fatalf(context.Background(), "could not server: %s", err)
+		logger.Errorf(context.Background(), "while serving the api server: %s", err)
+		panic(err)
 	}
 }
