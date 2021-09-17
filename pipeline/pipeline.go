@@ -12,9 +12,10 @@ type PerformMove []poc.PerformMoveCaller
 
 // CallPerformMove exits early at the first command that returns an error.
 func (ppipe PerformMove) CallPerformMove(ctx context.Context, p poc.PerformMove) (poc.PerformMove, error) {
+	var err error
 
 	for _, step := range ppipe {
-		p, err := step.CallPerformMove(ctx, p)
+		p, err = step.CallPerformMove(ctx, p)
 		if err != nil {
 			return p, err
 		}
@@ -28,8 +29,10 @@ type StartGame []poc.StartGameCaller
 
 // CallStartGame exits early at the first command that returns an error.
 func (spipe StartGame) CallStartGame(ctx context.Context, s poc.StartGame) (poc.StartGame, error) {
+	var err error
+
 	for _, step := range spipe {
-		s, err := step.CallStartGame(ctx, s)
+		s, err = step.CallStartGame(ctx, s)
 		if err != nil {
 			return s, err
 		}
@@ -43,8 +46,10 @@ type ListGames []poc.ListGamesCaller
 
 // CallListGames exits early at the first command that returns an error.
 func (lpipe ListGames) CallListGames(ctx context.Context, s poc.ListGames) (poc.ListGames, error) {
+	var err error
+
 	for _, step := range lpipe {
-		s, err := step.CallListGames(ctx, s)
+		s, err = step.CallListGames(ctx, s)
 		if err != nil {
 			return s, err
 		}
