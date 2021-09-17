@@ -9,8 +9,8 @@ import (
 	"github.com/slcjordan/poc"
 )
 
-// InvalidMove means the user tried a bad move.
-var InvalidMove = errors.New("invalid move")
+// ErrInvalidMove means the user tried a bad move.
+var ErrInvalidMove = errors.New("invalid move")
 
 func nextMoves(
 	stock []poc.PositionedCard,
@@ -271,11 +271,11 @@ func (v Validate) CallPerformMove(ctx context.Context, move poc.PerformMove) (po
 		return (&a).Compare(&input) >= 0
 	})
 	if result >= len(possible) {
-		return move, poc.Error{Actual: InvalidMove, Category: poc.SemanticError}
+		return move, poc.Error{Actual: ErrInvalidMove, Category: poc.SemanticError}
 	}
 	target := sortable(possible[result])
 	if (&target).Compare(&input) != 0 {
-		return move, poc.Error{Actual: InvalidMove, Category: poc.SemanticError}
+		return move, poc.Error{Actual: ErrInvalidMove, Category: poc.SemanticError}
 	}
 	return move, nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
 
+	"github.com/slcjordan/poc"
 	"github.com/slcjordan/poc/config"
 	"github.com/slcjordan/poc/db"
 	"github.com/slcjordan/poc/encoding/json"
@@ -48,26 +49,39 @@ func APIServer() http.Handler {
 		StartGame: handler.StartGame{
 			Encoding: json.V1{},
 			Command: pipeline.StartGame{
+				Debug{Name: "decoding"},
 				rules.Shuffle{Source: rand.NewSource(time.Now().UnixNano())},
+				Debug{Name: "shuffle"},
 				save,
+				Debug{Name: "save"},
 				rules.NextMove{},
+				Debug{Name: "next move"},
 			},
 		},
 		PerformMove: handler.PerformMove{
 			Encoding: json.V1{},
 			Command: pipeline.PerformMove{
+				Debug{Name: "decoding"},
 				v1HydrateParams,
+				Debug{Name: "hydrate"},
 				lookup,
+				Debug{Name: "lookup"},
 				rules.Validate{},
+				Debug{Name: "validate"},
 				save,
+				Debug{Name: "save"},
 				rules.NextMove{},
+				Debug{Name: "next move"},
 			},
 		},
 		ListGames: handler.ListGames{
 			Encoding: json.V1{},
 			Command: pipeline.ListGames{
+				Debug{Name: "decoding"},
 				v1HydrateParams,
+				Debug{Name: "hydrate"},
 				search,
+				Debug{Name: "search"},
 			},
 		},
 	},
@@ -88,4 +102,34 @@ func MustServe() {
 		logger.Errorf(context.Background(), "while serving the api server: %s", err)
 		panic(err)
 	}
+}
+
+// Debug debugs the app.
+type Debug struct {
+	Name    string
+	Enabled bool
+}
+
+// CallStartGame debugs a start game command.
+func (d Debug) CallStartGame(ctx context.Context, game poc.StartGame) (poc.StartGame, error) {
+	if d.Enabled {
+		logger.Infof(ctx, "after %#v the value is %v", d.Name, game)
+	}
+	return game, nil
+}
+
+// CallPerformMove debugs a perform move command.
+func (d Debug) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.PerformMove, error) {
+	if d.Enabled {
+		logger.Infof(ctx, "after %#v the value is %v", d.Name, move)
+	}
+	return move, nil
+}
+
+// CallListGames debugs a list game command.
+func (d Debug) CallListGames(ctx context.Context, list poc.ListGames) (poc.ListGames, error) {
+	if d.Enabled {
+		logger.Infof(ctx, "after %#v the value is %v", d.Name, list)
+	}
+	return list, nil
 }

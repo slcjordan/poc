@@ -52,6 +52,7 @@ func toV1Moves(moves [][]poc.Move) [][]v1Move {
 	result := make([][]v1Move, len(moves))
 	lookupV1Move := map[poc.Position][]string{
 		poc.FaceUp: {"face_up"},
+		0:          {},
 	}
 	for i := range moves {
 		result[i] = make([]v1Move, len(moves[i]))
@@ -73,6 +74,7 @@ func toV1Piles(cards [13][]poc.PositionedCard) [13][]v1PositionedCard {
 	var result [13][]v1PositionedCard
 	lookupV1Move := map[poc.Position][]string{
 		poc.FaceUp: {"face_up"},
+		0:          {},
 	}
 	for idx := 0; idx < 13; idx++ {
 		result[idx] = make([]v1PositionedCard, len(cards[idx]))
@@ -161,8 +163,6 @@ func (v V1) DecodeListGames(b []byte) (poc.ListGames, error) {
 func (v V1) EncodeListGames(list poc.ListGames) ([]byte, error) {
 	result := make([]struct {
 		GameID int64 `json:"game_id"`
-		IsOver bool  `json:"is_over"`
-		IsWon  bool  `json:"is_won"`
 		Score  int32 `json:"score"`
 	}, len(list.Result))
 	for i := range list.Result {

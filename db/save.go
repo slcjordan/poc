@@ -22,17 +22,36 @@ func (s *Save) CallStartGame(ctx context.Context, start poc.StartGame) (poc.Star
 		logger.Infof(ctx, "could not acquire connection: %s", err)
 		return start, poc.Error{Actual: errors.New("db unavailable"), Category: poc.UnavailableError}
 	}
-	row, err := sqlc.New(conn).SaveStartGame(ctx, sqlc.SaveStartGameParams{
+	var pileNums []int16
+	var pileIndexes []int16
+	var suits []int16
+	var indexes []int16
+	var positions []int32
+
+	for pileNum, curr := range start.Result.Board.Piles {
+		for pileIndex, card := range curr {
+			pileNums = append(pileNums, int16(pileNum))
+			pileIndexes = append(pileIndexes, int16(pileIndex))
+			suits = append(suits, int16(card.Card.Suit))
+			indexes = append(indexes, int16(card.Card.Index))
+			positions = append(positions, int32(card.Position))
+		}
+	}
+	logger.Infof(ctx, "pileNums: %v, pileIndexes: %v suits: %v, indexes: %v, positions: %v", pileNums, pileIndexes, suits, indexes, positions)
+	gameID, err := sqlc.New(conn).SaveStartGame(ctx, sqlc.SaveStartGameParams{
 		Score:               start.Result.Board.Score,
+		PileNums:            pileNums,
+		PileIndexes:         pileIndexes,
+		Suits:               suits,
+		Indexes:             indexes,
+		Positions:           positions,
 		MaxTimesThroughDeck: start.Result.Variant.MaxTimesThroughDeck,
 	})
 	if err != nil {
 		logger.Errorf(ctx, "could not save game: %s", err)
 		return start, poc.Error{Actual: errors.New("could not save game"), Category: poc.UnknownError}
 	}
-	start.Result.GameID = row.ID
-	start.Result.Board.Score = row.Score
-	start.Result.Variant.MaxTimesThroughDeck = row.MaxTimesThroughDeck
+	start.Result.GameID = gameID
 	return start, nil
 }
 
