@@ -10,47 +10,49 @@ import (
 const saveStartGame = `-- name: SaveStartGame :one
 WITH inserted_game AS (
   INSERT INTO game (score, max_times_through_deck)
-  VALUES ($6, $7)
+  VALUES ($1, $2)
   RETURNING id, score, max_times_through_deck
+),
+inserted_pile AS (
+  INSERT INTO pile_card (
+    pile_num,
+    pile_index,
+    suit,
+    index,
+    position,
+    game_id
+  )
+  SELECT UNNEST($3::smallint[]) AS pile_num,
+    UNNEST($4::smallint[]) AS pile_index,
+    UNNEST($5::smallint[]) AS suit,
+    UNNEST($6::smallint[]) AS index,
+    UNNEST($7::integer[]) AS position,
+    inserted_game.id AS game_id
+  FROM inserted_game
 )
-INSERT INTO pile_card (
-  pile_num,
-  pile_index,
-  suit,
-  index,
-  position,
-  game_id
-)
-SELECT UNNEST($1::smallint[]) AS pile_num,
-  UNNEST($2::smallint[]) AS pile_index,
-  UNNEST($3::smallint[]) AS suit,
-  UNNEST($4::smallint[]) AS index,
-  UNNEST($5::integer[]) AS position,
-  inserted_game.id AS game_id
-FROM inserted_game
-RETURNING id AS game_id
+SELECT id AS game_id FROM inserted_game
 `
 
 type SaveStartGameParams struct {
+	Score               int32
+	MaxTimesThroughDeck int32
 	PileNums            []int16
 	PileIndexes         []int16
 	Suits               []int16
 	Indexes             []int16
 	Positions           []int32
-	Score               int32
-	MaxTimesThroughDeck int32
 }
 
 // Start a game.
 func (q *Queries) SaveStartGame(ctx context.Context, arg SaveStartGameParams) (int64, error) {
 	row := q.db.QueryRow(ctx, saveStartGame,
+		arg.Score,
+		arg.MaxTimesThroughDeck,
 		arg.PileNums,
 		arg.PileIndexes,
 		arg.Suits,
 		arg.Indexes,
 		arg.Positions,
-		arg.Score,
-		arg.MaxTimesThroughDeck,
 	)
 	var game_id int64
 	err := row.Scan(&game_id)

@@ -22,6 +22,8 @@ const (
 	gameIDKey = "gameID"
 )
 
+//go:generate go run github.com/golang/mock/mockgen -package=test -destination=../test/mock_router_router.go -source=router.go
+
 // A ByteCaller processes request bodies and returns response bodies.
 type ByteCaller interface {
 	CallBytes(context.Context, []byte) ([]byte, error)
@@ -60,7 +62,7 @@ func (mux *Mux) RegisterRoutesV1(
 ) {
 	router := mux.router.With(middlewares...)
 	router.Post("/v1/game/start", handlerFunc(handlers.StartGame))
-	router.Post(fmt.Sprintf("/mux/game/{%s}/move", gameIDKey), handlerFunc(handlers.PerformMove))
+	router.Post(fmt.Sprintf("/v1/game/{%s}/move", gameIDKey), handlerFunc(handlers.PerformMove))
 	router.Get("/v1/game/list", handlerFunc(handlers.ListGames))
 }
 
@@ -120,7 +122,10 @@ func (params V1HydrateURLAndQueryParams) CallPerformMove(ctx context.Context, mo
 	gameID := chi.URLParamFromCtx(ctx, gameIDKey)
 	var err error
 	move.Input.GameID, err = strconv.ParseInt(gameID, 10, 64)
-	return move, poc.Error{Actual: err, Category: poc.MalformedError}
+	if err != nil {
+		return move, poc.Error{Actual: err, Category: poc.MalformedError}
+	}
+	return move, nil
 }
 
 // CallListGames adds list.Input.Limit and list.Input.Offset url query param.

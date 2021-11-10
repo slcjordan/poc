@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/slcjordan/poc"
 )
@@ -14,7 +15,8 @@ type PerformMove []poc.PerformMoveCaller
 func (ppipe PerformMove) CallPerformMove(ctx context.Context, p poc.PerformMove) (poc.PerformMove, error) {
 	var err error
 
-	for _, step := range ppipe {
+	for i, step := range ppipe {
+		fmt.Printf("step %d\n", i)
 		p, err = step.CallPerformMove(ctx, p)
 		if err != nil {
 			return p, err

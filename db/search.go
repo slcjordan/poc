@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/slcjordan/poc"
 	"github.com/slcjordan/poc/db/sqlc"
 	"github.com/slcjordan/poc/logger"
@@ -12,10 +11,10 @@ import (
 
 // Search uses search parameters to find multiple results.
 type Search struct {
-	Pool *pgxpool.Pool
+	Pool PgxPoolIface
 }
 
-// CallListGame has a default ordering by game id.
+// CallListGames has a default ordering by game id.
 func (s *Search) CallListGames(ctx context.Context, list poc.ListGames) (poc.ListGames, error) {
 	conn, err := s.Pool.Acquire(ctx)
 	if err != nil {

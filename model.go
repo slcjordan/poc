@@ -68,3 +68,31 @@ type Board struct {
 type Variant struct {
 	MaxTimesThroughDeck int32
 }
+
+// Move is a transformation of the board.
+type Move struct {
+	OldPileNum      int
+	OldPileIndex    int
+	OldPilePosition Position
+	NewPileNum      int
+	NewPileIndex    int
+	NewPilePosition Position
+}
+
+// History is a record of moves.
+type History [][]Move
+
+// SavedGameSummary is a saved game with summary of the game state.
+type SavedGameSummary struct {
+	GameID int64
+	Score  int32
+}
+
+// SavedGameDetail is a saved game with detail of the game state.
+type SavedGameDetail struct {
+	GameID            int64
+	Board             Board
+	History           History
+	PossibleNextMoves [][]Move
+	Variant           Variant
+}

@@ -11,8 +11,34 @@ PGHOST?=pocdb
 PGPASSWORD?=changeme
 PGPORT?=5432
 PGUSER?=poc
+PGADMIN_DEFAULT_EMAIL?=admin@admin.com
+PGADMIN_DEFAULT_PASSWORD?=admin123
+PGUSER?=poc
 DB_CONN_STRING?=postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}
 HTTP_LISTEN_ADDRESS?=0.0.0.0:8321
+
+.PHONY: test
+test: build/.empty-targets/generate
+	docker run \
+		--interactive \
+		--tty \
+		--network poc-demo \
+		--publish 8411:8411 \
+		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
+		--workdir /go/src/github.com/slcjordan/poc \
+		golang:${GO_VERSION} sh -c 'go test -v ./...'
+
+.PHONY: admin
+admin:
+	docker run \
+		--interactive \
+		--tty \
+		--env PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL} \
+		--env PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD} \
+		--network poc-demo \
+		--publish 8180:80 \
+		--volume ${PWD}/data/pgadmin:/var/lib/pgadmin \
+		dpage/pgadmin4
 
 .PHONY: run-docs
 run-docs:
@@ -24,7 +50,7 @@ run-docs:
 		--publish 8411:8411 \
 		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
 		--workdir /go/src/github.com/slcjordan/poc/cmd/api \
-		golang:${GO_VERSION} sh -c 'go get -v  golang.org/x/tools/cmd/godoc && godoc -http=:8411'
+		golang:${GO_VERSION} sh -c 'go get -v golang.org/x/tools/cmd/godoc && godoc -http=:8411'
 
 .PHONY: generate
 generate: build/.empty-targets/generate
@@ -50,7 +76,16 @@ start-services: build/.empty-targets/network
 		postgres:${POSTGRES_VERSION}
 
 build/.empty-targets/generate: ${GO_GENERATE_DEPS}
-	go generate
+	@mkdir -p test
+	@echo "(re)generating mocks"
+	rm test/*
+	docker run \
+		--interactive \
+		--rm \
+		--volume $(PWD):/go/src/github.com/slcjordan/poc \
+		--workdir /go/src/github.com/slcjordan/poc \
+		golang:1.16 \
+		sh -c 'go get -v golang.org/x/tools/cmd/stringer && go get -v github.com/golang/mock/mockgen@v1.6.0 && go generate -v ./...'
 	@mkdir -p $(@D)
 	@touch $@
 
@@ -64,6 +99,7 @@ psql: start-services
 	docker run \
 		--interactive \
 		--tty \
+		--publish 5432:5432 \
 		--network poc-demo \
 		--env PGDATABASE=${PGDATABASE} \
 		--env PGHOST=${PGHOST} \
@@ -83,6 +119,7 @@ run-dev: start-services
 		--env DB_CONN_STRING=${DB_CONN_STRING} \
 		--env HTTP_LISTEN_ADDRESS=${HTTP_LISTEN_ADDRESS} \
 		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
+		--volume /Users/jordan/Developer/src/gitlab.com/route/platform/orders/metrics:/go/src/gitlab.com/route/platform/orders/metrics \
 		--workdir /go/src/github.com/slcjordan/poc/cmd/api \
 		golang:${GO_VERSION} go run main.go
 
