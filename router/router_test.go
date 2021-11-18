@@ -15,15 +15,14 @@ func TestRouter(t *testing.T) {
 	// setup dependencies
 	ctrl := gomock.NewController(t)
 	command := test.NewMockByteCaller(ctrl)
-	mux := NewMux()
-	mux.RegisterRoutesV1(V1Handlers{
+	mux := New(V1Handlers{
 		StartGame:   command,
 		PerformMove: command,
 		ListGames:   command,
 	})
 
 	// run tests
-	t.Run("semantic error on save results in 404", checkSaveErrorCode(command, mux, "/v1/game/list", poc.SemanticError, 422))
+	t.Run("semantic error on save results in 422", checkSaveErrorCode(command, mux, "/v1/game/list", poc.SemanticError, 422))
 }
 
 func checkSaveErrorCode(command *test.MockByteCaller, mux http.Handler, path string, category poc.ErrorCategory, expected int) func(*testing.T) {

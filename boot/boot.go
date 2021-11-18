@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
+	chi "github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"github.com/slcjordan/poc/config"
 	"github.com/slcjordan/poc/db"
 	"github.com/slcjordan/poc/encoding/json"
 	"github.com/slcjordan/poc/handler"
@@ -19,7 +19,8 @@ import (
 	"github.com/slcjordan/poc/rules"
 )
 
-func mustConnect(connString string) *pgxpool.Pool {
+// PGXConnect connects to db using pgx library
+func PGXConnect(connString string) *pgxpool.Pool {
 	conn, err := pgxpool.Connect(context.Background(), connString)
 	if err != nil {
 		logger.Errorf(context.Background(), "could not connect: %s", err)
@@ -35,16 +36,24 @@ func mustConnect(connString string) *pgxpool.Pool {
 	return conn
 }
 
+// MustServe serves the api server and fatally exits on error.
+func MustServe(s *http.Server) {
+	logger.Infof(context.Background(), "Listening at %#v", s.Addr)
+	err := s.ListenAndServe()
+	if err != nil {
+		logger.Errorf(context.Background(), "while serving the api server: %s", err)
+		panic(err)
+	}
+}
+
 // APIServer connects to database; sets up routes and handlers.
-func APIServer() http.Handler {
-	mux := router.NewMux()
+func APIServer(pool db.PgxPoolIface) chi.Router {
 	v1HydrateParams := router.V1HydrateURLAndQueryParams{OffsetKey: "offset", LimitKey: "limit"}
-	pool := mustConnect(config.DB.ConnString)
 	save := &db.Save{Pool: pool}
 	search := &db.Search{Pool: pool}
 	lookup := &db.Lookup{Pool: pool}
 
-	mux.RegisterRoutesV1(router.V1Handlers{
+	return router.New(router.V1Handlers{
 		StartGame: handler.StartGame{
 			Encoding: json.V1{},
 			Command: pipeline.StartGame{
@@ -73,19 +82,4 @@ func APIServer() http.Handler {
 	},
 		middleware.Logger,
 	)
-	return mux
-}
-
-// MustServe serves the api server and fatally exits on error.
-func MustServe() {
-	config.DB.ShouldParse = true
-	config.HTTP.ShouldParse = true
-	config.MustParse()
-
-	logger.Infof(context.Background(), "Listening at %#v", config.HTTP.ListenAddress)
-	err := http.ListenAndServe(config.HTTP.ListenAddress, APIServer())
-	if err != nil {
-		logger.Errorf(context.Background(), "while serving the api server: %s", err)
-		panic(err)
-	}
 }

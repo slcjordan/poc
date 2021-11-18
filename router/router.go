@@ -29,11 +29,6 @@ type ByteCaller interface {
 	CallBytes(context.Context, []byte) ([]byte, error)
 }
 
-// Mux routes mux requests.
-type Mux struct {
-	router *chi.Mux
-}
-
 // V1Handlers members must not be nil.
 type V1Handlers struct {
 	StartGame   ByteCaller
@@ -41,33 +36,16 @@ type V1Handlers struct {
 	ListGames   ByteCaller
 }
 
-// NewMux initializes a mux handler.
-func NewMux() *Mux {
-	return &Mux{
-		router: chi.NewRouter(),
-	}
-}
-
-// Use sets up mux middleware.
-func (mux *Mux) Use(
+// New sets up routes with passed middleware.
+func New(
+	v1 V1Handlers,
 	middlewares ...func(http.Handler) http.Handler,
-) {
-	mux.router.Use(middlewares...)
-}
-
-// RegisterRoutesV1 sets up v1 routes with passed middleware.
-func (mux *Mux) RegisterRoutesV1(
-	handlers V1Handlers,
-	middlewares ...func(http.Handler) http.Handler,
-) {
-	router := mux.router.With(middlewares...)
-	router.Post("/v1/game/start", handlerFunc(handlers.StartGame))
-	router.Post(fmt.Sprintf("/v1/game/{%s}/move", gameIDKey), handlerFunc(handlers.PerformMove))
-	router.Get("/v1/game/list", handlerFunc(handlers.ListGames))
-}
-
-func (mux *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	mux.router.ServeHTTP(w, r)
+) chi.Router {
+	router := chi.NewRouter().With(middlewares...)
+	router.Post("/v1/game/start", handlerFunc(v1.StartGame))
+	router.Post(fmt.Sprintf("/v1/game/{%s}/move", gameIDKey), handlerFunc(v1.PerformMove))
+	router.Get("/v1/game/list", handlerFunc(v1.ListGames))
+	return router
 }
 
 func handlerFunc(f ByteCaller) http.HandlerFunc {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/slcjordan/poc"
 	"github.com/slcjordan/poc/db/sqlc"
@@ -13,14 +12,7 @@ import (
 
 // PgxPoolIface is a pool of postgres connections.
 type PgxPoolIface interface {
-	Begin(ctx context.Context) (pgx.Tx, error)
-	BeginFunc(ctx context.Context, f func(pgx.Tx) error) (err error)
-	CopyFrom(ctx context.Context, tableName pgx.Identifier, columnNames []string, rowSrc pgx.CopyFromSource) (int64, error)
-	SendBatch(ctx context.Context, b *pgx.Batch) pgx.BatchResults
-	Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error)
-	QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row
 	Acquire(ctx context.Context) (*pgxpool.Conn, error)
-	Close()
 }
 
 // Save commands create or update data.
