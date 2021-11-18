@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
 
+	"github.com/slcjordan/poc/config"
 	"github.com/slcjordan/poc/db"
 	"github.com/slcjordan/poc/encoding/json"
 	"github.com/slcjordan/poc/handler"
@@ -44,6 +45,19 @@ func MustServe(s *http.Server) {
 		logger.Errorf(context.Background(), "while serving the api server: %s", err)
 		panic(err)
 	}
+}
+
+// MustServeFromConfig parses config and serves
+func MustServeFromConfig() {
+	config.DB.ShouldParse = true
+	config.HTTP.ShouldParse = true
+	config.MustParse()
+	pool := PGXConnect(config.DB.ConnString)
+
+	MustServe(&http.Server{
+		Addr:    config.HTTP.ListenAddress,
+		Handler: APIServer(pool),
+	})
 }
 
 // APIServer connects to database; sets up routes and handlers.
