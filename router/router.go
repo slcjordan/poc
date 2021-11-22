@@ -22,7 +22,7 @@ const (
 	gameIDKey = "gameID"
 )
 
-//go:generate go run github.com/golang/mock/mockgen -package=test -destination=../test/mock_router_router.go -source=router.go
+//go:generate go run github.com/golang/mock/mockgen -package=mocks -destination=../test/mocks/router.go -source=router.go
 
 // A ByteCaller processes request bodies and returns response bodies.
 type ByteCaller interface {

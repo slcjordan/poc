@@ -2,7 +2,7 @@ package poc
 
 import "context"
 
-//go:generate go run github.com/golang/mock/mockgen -package=test -destination=test/mock_commands.go -source=commands.go
+//go:generate go run github.com/golang/mock/mockgen -package=mocks -destination=test/mocks/commands.go -source=commands.go
 
 // StartGame starts a game.
 type StartGame struct {

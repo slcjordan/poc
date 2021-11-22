@@ -11,7 +11,7 @@ import (
 
 // Lookup commands fetch data using a primary key passed in by the caller.
 type Lookup struct {
-	Pool PgxPoolIface
+	Pool Pool
 }
 
 // CallPerformMove expects move.Input.GameID to be set.

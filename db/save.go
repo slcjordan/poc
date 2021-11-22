@@ -4,20 +4,27 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/slcjordan/poc"
 	"github.com/slcjordan/poc/db/sqlc"
 	"github.com/slcjordan/poc/logger"
 )
 
-// PgxPoolIface is a pool of postgres connections.
-type PgxPoolIface interface {
-	Acquire(ctx context.Context) (*pgxpool.Conn, error)
+//go:generate go run github.com/golang/mock/mockgen -package=mocks -destination=../test/mocks/db.go -source=save.go
+
+// Conn is a db conn.
+type Conn interface {
+	Release()
+	sqlc.DBTX
+}
+
+// Pool is a pool of db connections.
+type Pool interface {
+	Acquire(ctx context.Context) (Conn, error)
 }
 
 // Save commands create or update data.
 type Save struct {
-	Pool PgxPoolIface
+	Pool Pool
 }
 
 // CallStartGame saves start.Result as a new game.
@@ -42,7 +49,6 @@ func (s *Save) CallStartGame(ctx context.Context, start poc.StartGame) (poc.Star
 			positions = append(positions, int32(card.Position))
 		}
 	}
-	logger.Infof(ctx, "pileNums: %v, pileIndexes: %v suits: %v, indexes: %v, positions: %v", pileNums, pileIndexes, suits, indexes, positions)
 	gameID, err := sqlc.New(conn).SaveStartGame(ctx, sqlc.SaveStartGameParams{
 		Score:               start.Result.Board.Score,
 		PileNums:            pileNums,

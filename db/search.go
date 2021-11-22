@@ -11,7 +11,7 @@ import (
 
 // Search uses search parameters to find multiple results.
 type Search struct {
-	Pool PgxPoolIface
+	Pool Pool
 }
 
 // CallListGames has a default ordering by game id.

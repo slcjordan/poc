@@ -78,7 +78,7 @@ start-services: build/.empty-targets/network
 build/.empty-targets/generate: ${GO_GENERATE_DEPS}
 	@mkdir -p test
 	@echo "(re)generating mocks"
-	rm test/*
+	- rm test/mocks/*
 	docker run \
 		--interactive \
 		--rm \

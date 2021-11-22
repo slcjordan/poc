@@ -12,6 +12,7 @@ import (
 
 	"github.com/slcjordan/poc/config"
 	"github.com/slcjordan/poc/db"
+	"github.com/slcjordan/poc/db/sqlc"
 	"github.com/slcjordan/poc/encoding/json"
 	"github.com/slcjordan/poc/handler"
 	"github.com/slcjordan/poc/logger"
@@ -20,8 +21,15 @@ import (
 	"github.com/slcjordan/poc/rules"
 )
 
-// PGXConnect connects to db using pgx library
-func PGXConnect(connString string) *pgxpool.Pool {
+type poolWrapper struct {
+	pool *pgxpool.Pool
+}
+
+func (p *poolWrapper) Acquire(ctx context.Context) (sqlc.DBTX, error) {
+	return p.pool.Acquire(ctx)
+}
+
+func pgxConnect(connString string) *poolWrapper {
 	conn, err := pgxpool.Connect(context.Background(), connString)
 	if err != nil {
 		logger.Errorf(context.Background(), "could not connect: %s", err)
@@ -34,7 +42,7 @@ func PGXConnect(connString string) *pgxpool.Pool {
 		conn.Config().ConnConfig.Config.Host,
 		conn.Config().ConnConfig.Config.Port,
 	)
-	return conn
+	return &poolWrapper{conn}
 }
 
 // MustServe serves the api server and fatally exits on error.
@@ -52,7 +60,7 @@ func MustServeFromConfig() {
 	config.DB.ShouldParse = true
 	config.HTTP.ShouldParse = true
 	config.MustParse()
-	pool := PGXConnect(config.DB.ConnString)
+	pool := pgxConnect(config.DB.ConnString)
 
 	MustServe(&http.Server{
 		Addr:    config.HTTP.ListenAddress,

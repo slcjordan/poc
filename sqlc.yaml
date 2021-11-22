@@ -6,4 +6,3 @@ packages:
     schema: "db/sqlc/schema.sql"
     queries: "db/sqlc"
     sql_package: "pgx/v4"
-
