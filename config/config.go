@@ -20,15 +20,13 @@ func Register(p Parser) {
 	parsers = append(parsers, p)
 }
 
-// DB should only be parsed when DB.ShoulParse is true.
+// DB options.
 var DB struct {
-	ShouldParse bool
-	ConnString  string
+	ConnString string
 }
 
-// HTTP should only be parsed when HTTP.ShoulParse is true.
+// HTTP options.
 var HTTP struct {
-	ShouldParse   bool
 	ListenAddress string
 }
 

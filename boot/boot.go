@@ -12,7 +12,6 @@ import (
 
 	"github.com/slcjordan/poc/config"
 	"github.com/slcjordan/poc/db"
-	"github.com/slcjordan/poc/db/sqlc"
 	"github.com/slcjordan/poc/encoding/json"
 	"github.com/slcjordan/poc/handler"
 	"github.com/slcjordan/poc/logger"
@@ -25,7 +24,7 @@ type poolWrapper struct {
 	pool *pgxpool.Pool
 }
 
-func (p *poolWrapper) Acquire(ctx context.Context) (sqlc.DBTX, error) {
+func (p *poolWrapper) Acquire(ctx context.Context) (db.Conn, error) {
 	return p.pool.Acquire(ctx)
 }
 
@@ -57,8 +56,6 @@ func MustServe(s *http.Server) {
 
 // MustServeFromConfig parses config and serves
 func MustServeFromConfig() {
-	config.DB.ShouldParse = true
-	config.HTTP.ShouldParse = true
 	config.MustParse()
 	pool := pgxConnect(config.DB.ConnString)
 
@@ -69,21 +66,21 @@ func MustServeFromConfig() {
 }
 
 // APIServer connects to database; sets up routes and handlers.
-func APIServer(pool db.PgxPoolIface) chi.Router {
+func APIServer(pool db.Pool) chi.Router {
 	v1HydrateParams := router.V1HydrateURLAndQueryParams{OffsetKey: "offset", LimitKey: "limit"}
 	save := &db.Save{Pool: pool}
 	search := &db.Search{Pool: pool}
 	lookup := &db.Lookup{Pool: pool}
 
 	return router.New(router.V1Handlers{
-		StartGame: handler.StartGame{
+		StartGame: logger.BytesMiddleware(handler.StartGame{
 			Encoding: json.V1{},
-			Command: pipeline.StartGame{
+			Command: logger.StartGameMiddleware(pipeline.StartGame{
 				rules.Shuffle{Source: rand.NewSource(time.Now().UnixNano())},
 				save,
 				rules.NextMove{},
-			},
-		},
+			}),
+		}),
 		PerformMove: handler.PerformMove{
 			Encoding: json.V1{},
 			Command: pipeline.PerformMove{

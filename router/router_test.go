@@ -1,4 +1,4 @@
-package router
+package router_test
 
 import (
 	"errors"
@@ -8,7 +8,9 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+
 	"github.com/slcjordan/poc"
+	"github.com/slcjordan/poc/router"
 	"github.com/slcjordan/poc/test/mocks"
 )
 
@@ -43,7 +45,7 @@ func checkSaveErrorCode(method string, path string, category poc.ErrorCategory, 
 		// setup dependencies
 		ctrl := gomock.NewController(t)
 		command := mocks.NewMockByteCaller(ctrl)
-		mux := New(V1Handlers{
+		mux := router.New(router.V1Handlers{
 			StartGame:   command,
 			PerformMove: command,
 			ListGames:   command,
