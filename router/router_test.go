@@ -20,7 +20,7 @@ func TestRouter(t *testing.T) {
 		Method string
 		Path   string
 	}{
-		{http.MethodGet, "/v1/game/list"},
+		{http.MethodPost, "/v1/game/start"},
 		{http.MethodPost, "/v1/game/2021/move"},
 		{http.MethodGet, "/v1/game/list"},
 	} {

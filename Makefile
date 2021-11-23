@@ -2,6 +2,8 @@ PWD=$(shell pwd)
 GO_GENERATE_DEPS=$(shell grep --recursive --files-with-matches 'go:generate' .)
 SQLC_DEPS=$(shell ls db/sqlc/*.sql | grep --invert-match db/sqlc/schema.sql)
 DEFAULT_GO_VERSION=$(shell cat go.mod | grep 'go \d.\d\d' | sed 's/go //')
+NON_INTEGRATION_TESTS=$(shell go list ./... | grep -v test/)
+INTEGRATION_TESTS=$(shell go list ./... | grep test/integration)
 
 GO_VERSION?=${DEFAULT_GO_VERSION}
 POSTGRES_VERSION?=13.2
@@ -17,6 +19,18 @@ PGUSER?=poc
 DB_CONN_STRING?=postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}
 HTTP_LISTEN_ADDRESS?=0.0.0.0:8321
 
+.PHONY: test-integration
+test-integration: start-services build/.empty-targets/generate
+	docker run \
+		--interactive \
+		--tty \
+		--network poc-demo \
+		--env DB_CONN_STRING=${DB_CONN_STRING} \
+		--env HTTP_LISTEN_ADDRESS=${HTTP_LISTEN_ADDRESS} \
+		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
+		--workdir /go/src/github.com/slcjordan/poc \
+		golang:${GO_VERSION} sh -c 'go test -v ${INTEGRATION_TESTS}'
+
 .PHONY: test
 test: build/.empty-targets/generate
 	docker run \
@@ -26,7 +40,7 @@ test: build/.empty-targets/generate
 		--publish 8411:8411 \
 		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
 		--workdir /go/src/github.com/slcjordan/poc \
-		golang:${GO_VERSION} sh -c 'go test -v ./...'
+		golang:${GO_VERSION} sh -c 'go test -v ${NON_INTEGRATION_TESTS}'
 
 .PHONY: admin
 admin:
@@ -119,7 +133,6 @@ run-dev: start-services
 		--env DB_CONN_STRING=${DB_CONN_STRING} \
 		--env HTTP_LISTEN_ADDRESS=${HTTP_LISTEN_ADDRESS} \
 		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
-		--volume /Users/jordan/Developer/src/gitlab.com/route/platform/orders/metrics:/go/src/gitlab.com/route/platform/orders/metrics \
 		--workdir /go/src/github.com/slcjordan/poc/cmd/api \
 		golang:${GO_VERSION} go run main.go
 

@@ -28,7 +28,7 @@ func (p *poolWrapper) Acquire(ctx context.Context) (db.Conn, error) {
 	return p.pool.Acquire(ctx)
 }
 
-func pgxConnect(connString string) *poolWrapper {
+func PGXConnect(connString string) *poolWrapper {
 	conn, err := pgxpool.Connect(context.Background(), connString)
 	if err != nil {
 		logger.Errorf(context.Background(), "could not connect: %s", err)
@@ -57,7 +57,7 @@ func MustServe(s *http.Server) {
 // MustServeFromConfig parses config and serves
 func MustServeFromConfig() {
 	config.MustParse()
-	pool := pgxConnect(config.DB.ConnString)
+	pool := PGXConnect(config.DB.ConnString)
 
 	MustServe(&http.Server{
 		Addr:    config.HTTP.ListenAddress,
