@@ -10,8 +10,17 @@ import (
 	"github.com/slcjordan/poc/logger"
 )
 
-// Use JSON structured logging
-var JSON bool
+//go:generate stringer -type=outputFormat
+type outputFormat uint8
+
+// supported formats
+const (
+	Log outputFormat = iota
+	JSON
+)
+
+// Format to be used for logging. Not safe for concurrent read/writes.
+var Format outputFormat
 
 type withDepth struct {
 	Logger *log.Logger
@@ -19,7 +28,8 @@ type withDepth struct {
 }
 
 func (w withDepth) Printf(ctx context.Context, format string, a ...interface{}) {
-	if JSON {
+	switch Format {
+	case JSON:
 		var val logger.Values
 		prev, ok := ctx.Value(logger.ContextKey).(logger.Values)
 		if ok {
@@ -31,7 +41,7 @@ func (w withDepth) Printf(ctx context.Context, format string, a ...interface{}) 
 		if err != nil {
 			panic(err)
 		}
-	} else {
+	default:
 		err := w.Logger.Output(w.Depth, fmt.Sprintf(format, a...))
 		if err != nil {
 			panic(err)

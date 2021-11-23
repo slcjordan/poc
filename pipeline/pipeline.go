@@ -47,14 +47,14 @@ func (spipe StartGame) CallStartGame(ctx context.Context, s poc.StartGame) (poc.
 type ListGames []poc.ListGamesCaller
 
 // CallListGames exits early at the first command that returns an error.
-func (lpipe ListGames) CallListGames(ctx context.Context, s poc.ListGames) (poc.ListGames, error) {
+func (lpipe ListGames) CallListGames(ctx context.Context, l poc.ListGames) (poc.ListGames, error) {
 	var err error
 
 	for _, step := range lpipe {
-		s, err = step.CallListGames(ctx, s)
+		l, err = step.CallListGames(ctx, l)
 		if err != nil {
-			return s, err
+			return l, err
 		}
 	}
-	return s, nil
+	return l, nil
 }

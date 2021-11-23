@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	stdlib.JSON = true
+	stdlib.Format = stdlib.JSON
 	boot.MustServeFromConfig()
 }
