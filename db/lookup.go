@@ -21,6 +21,7 @@ func (l *Lookup) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc
 		logger.Infof(ctx, "could not acquire connection: %s", err)
 		return move, poc.Error{Actual: errors.New("db unavailable"), Category: poc.UnavailableError}
 	}
+	defer conn.Release()
 	_, err = sqlc.New(conn).LookupGameDetail(ctx, move.Input.GameID)
 	if err != nil {
 		logger.Errorf(ctx, "could not lookup game %d: %s", move.Input.GameID, err)

@@ -10,6 +10,18 @@ import (
 	"github.com/slcjordan/poc/logger"
 )
 
+func init() {
+	flags := log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile | log.LUTC
+	logger.RegisterInfo(withDepth{
+		Logger: log.New(os.Stdout, " [INFO] ", flags),
+		Depth:  3,
+	})
+	logger.RegisterError(withDepth{
+		Logger: log.New(os.Stderr, " [ERROR] ", flags),
+		Depth:  3,
+	})
+}
+
 //go:generate stringer -type=outputFormat
 type outputFormat uint8
 
@@ -31,7 +43,7 @@ func (w withDepth) Printf(ctx context.Context, format string, a ...interface{}) 
 	switch Format {
 	case JSON:
 		var val logger.Values
-		prev, ok := ctx.Value(logger.ContextKey).(logger.Values)
+		prev, ok := ctx.Value(logger.MiddlewareKey).(logger.Values)
 		if ok {
 			val = prev
 		}
@@ -47,16 +59,4 @@ func (w withDepth) Printf(ctx context.Context, format string, a ...interface{}) 
 			panic(err)
 		}
 	}
-}
-
-func init() {
-	flags := log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile | log.LUTC
-	logger.RegisterInfo(withDepth{
-		Logger: log.New(os.Stdout, " [INFO] ", flags),
-		Depth:  3,
-	})
-	logger.RegisterError(withDepth{
-		Logger: log.New(os.Stderr, " [ERROR] ", flags),
-		Depth:  3,
-	})
 }

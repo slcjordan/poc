@@ -21,6 +21,7 @@ func (s *Search) CallListGames(ctx context.Context, list poc.ListGames) (poc.Lis
 		logger.Infof(ctx, "could not acquire connection: %s", err)
 		return list, poc.Error{Actual: errors.New("db unavailable"), Category: poc.UnavailableError}
 	}
+	defer conn.Release()
 	rows, err := sqlc.New(conn).SearchGame(ctx, sqlc.SearchGameParams{
 		Limit:  list.Input.Limit,
 		Offset: list.Input.Offset,

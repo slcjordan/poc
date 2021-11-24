@@ -13,11 +13,22 @@ type Parser interface {
 	ParseConfig() error
 }
 
-var parsers []Parser
+var parsers [3][]Parser
+
+// Order determines parsing order
+//go:generate stringer -type=Order
+type Order int
+
+// First will be the first to run, meaning the value can be overwritten by later parsers.
+const (
+	First Order = iota
+	Second
+	Third
+)
 
 // Register should be called by a parse package's init function.
-func Register(p Parser) {
-	parsers = append(parsers, p)
+func Register(p Parser, o Order) {
+	parsers[o] = append(parsers[o], p)
 }
 
 // DB options.
@@ -33,11 +44,13 @@ var HTTP struct {
 // MustParse calls ParseConfig for all registered parsers and panics if there
 // is an error.
 func MustParse() {
-	for _, p := range parsers {
-		err := p.ParseConfig()
-		if err != nil {
-			logger.Errorf(context.Background(), "whlie parsing config: %s", err)
-			panic(err)
+	for _, o := range []Order{First, Second, Third} {
+		for _, p := range parsers[o] {
+			err := p.ParseConfig()
+			if err != nil {
+				logger.Errorf(context.Background(), "whlie parsing config: %s", err)
+				panic(err)
+			}
 		}
 	}
 }

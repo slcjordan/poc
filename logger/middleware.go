@@ -14,8 +14,8 @@ type ByteCaller interface {
 
 type middlewareKey string
 
-// ContextKey is used for logger context.
-const ContextKey = middlewareKey("key")
+// MiddlewareKey is used for logger context.
+const MiddlewareKey = middlewareKey("key")
 
 // Middleware injects context values from commands.
 type Middleware struct {
@@ -26,26 +26,26 @@ type Middleware struct {
 // CallBytes sets up logging context based on start game values.
 func (m Middleware) CallBytes(ctx context.Context, input []byte) ([]byte, error) {
 	var val Values
-	prev, ok := ctx.Value(ContextKey).(Values)
+	prev, ok := ctx.Value(MiddlewareKey).(Values)
 	if ok {
 		val = prev
 	}
 	val.Bytes = input
-	return m.NextBytes.CallBytes(context.WithValue(ctx, ContextKey, val), input)
+	return m.NextBytes.CallBytes(context.WithValue(ctx, MiddlewareKey, val), input)
 }
 
 // CallStartGame sets up logging context based on start game values.
 func (m Middleware) CallStartGame(ctx context.Context, input poc.StartGame) (poc.StartGame, error) {
 	var val Values
-	prev, ok := ctx.Value(ContextKey).(Values)
+	prev, ok := ctx.Value(MiddlewareKey).(Values)
 	if ok {
 		val = prev
 	}
 	val.StartGame = input
-	return m.NextStartGame.CallStartGame(context.WithValue(ctx, ContextKey, val), input)
+	return m.NextStartGame.CallStartGame(context.WithValue(ctx, MiddlewareKey, val), input)
 }
 
-// BytesMiddleware sets up start-game middleware.
+// BytesMiddleware sets up sMiddlewareKeymiddleware.
 func BytesMiddleware(next ByteCaller) Middleware {
 	return Middleware{
 		NextBytes: next,

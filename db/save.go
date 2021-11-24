@@ -34,6 +34,7 @@ func (s *Save) CallStartGame(ctx context.Context, start poc.StartGame) (poc.Star
 		logger.Infof(ctx, "could not acquire connection: %s", err)
 		return start, poc.Error{Actual: errors.New("db unavailable"), Category: poc.UnavailableError}
 	}
+	defer conn.Release()
 	var pileNums []int16
 	var pileIndexes []int16
 	var suits []int16
