@@ -15,14 +15,13 @@ middleware, etc.
 The project root
 ---
 The types of "commands" for this project are simply interfaces stored in the
-root directory under `commands.go`. Cammands manipulate service objects,
+root directory under `commands.go`. Commands manipulate service objects,
 defined in the same file.
 
 Domain entities are saved in a file called `model.go`. The structs in this file
 do not contain any struct tags as that would violate their purpose: to serve as
-stable domain values. There are be very few imports in this package and really
-only for the purpose of defining aggregate data-types (e.g. guregu/null
-package).
+stable domain values. There are very few imports in this package and really
+only to define aggregate data types (e.g. guregu/null package).
 
 Error types are stored in `error.go`and wrap underlying errors, conforming to
 Go's error convention (see https://pkg.go.dev/errors).
@@ -36,8 +35,8 @@ uses it. If code is thoughtfully organized by imports and function, this layout
 effectively enforces dependency inversion.
 
 > Note that per Dave Cheney's advice on fewer, larger packages, sub-folders
-are not be nested very deeply (Ideally only a single layer). And hold more,
-larger files than in other languages.
+are not nested very deeply (Ideally only a single layer). And hold more, larger
+files than in other languages.
 
 Pipelining commands
 ---
@@ -52,7 +51,7 @@ results from a command and transform those results back into bytes.
 
 Routers
 ---
-Routers hand the request body to byte handlers for processing and send back
+Routers hand the request body to byte handlers for processing and return
 response bodies, translating errors into http error codes.
 
 Dependency Setup
@@ -74,8 +73,8 @@ parent at import.
 Code generation
 ---
 Mocks, enum stringer methods, etc. are all generated using the `go:generate`
-comments. Basically the test setup duplicates the logic in the `boot` package
-using mock dependencies. Since we've defined our dependencies as interfaces, we
-can use mock-generation libraries like `golang/mock` to generate that code.
+comments. The test setup duplicates the logic in the `boot` package using mock
+dependencies. Since we've defined our dependencies as interfaces, we can use
+mock-generation libraries like `golang/mock` to generate that code.
 
-mocks are saved in the `test` directory.
+Mocks are saved in the `test` directory.
