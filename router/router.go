@@ -51,27 +51,24 @@ func New(
 func handlerFunc(f ByteCaller) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		writeHeader := func(err error) {
+			var status int
 			var catErr poc.Error
 			if errors.As(err, &catErr) {
-				switch catErr.Category {
-				case poc.SemanticError:
-					w.WriteHeader(http.StatusUnprocessableEntity)
-				case poc.MalformedError:
-					w.WriteHeader(http.StatusBadRequest)
-				case poc.UnavailableError:
-					w.WriteHeader(http.StatusServiceUnavailable)
-				case poc.UnimplementedError:
-					w.WriteHeader(http.StatusNotImplemented)
-				case poc.NotFoundError:
-					w.WriteHeader(http.StatusNotFound)
-				case poc.UnknownError:
-					w.WriteHeader(http.StatusInternalServerError)
-				default:
-					w.WriteHeader(http.StatusInternalServerError)
+				status = map[poc.ErrorCategory]int{
+					poc.SemanticError:      http.StatusUnprocessableEntity,
+					poc.MalformedError:     http.StatusBadRequest,
+					poc.UnavailableError:   http.StatusServiceUnavailable,
+					poc.UnimplementedError: http.StatusNotImplemented,
+					poc.NotFoundError:      http.StatusNotFound,
+					poc.UnknownError:       http.StatusInternalServerError,
+				}[catErr.Category]
+				if status == 0 {
+					status = http.StatusInternalServerError
 				}
 			} else {
-				w.WriteHeader(http.StatusInternalServerError)
+				status = http.StatusInternalServerError
 			}
+			w.WriteHeader(status)
 		}
 		body, err := io.ReadAll(r.Body)
 		if err != nil {

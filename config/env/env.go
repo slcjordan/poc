@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	config.Register(parser{})
+	config.Register(parser{}, config.First)
 }
 
 type parser struct{}
