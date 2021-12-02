@@ -96,7 +96,7 @@ type V1HydrateURLAndQueryParams struct {
 func (params V1HydrateURLAndQueryParams) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.PerformMove, error) {
 	gameID := chi.URLParamFromCtx(ctx, gameIDKey)
 	var err error
-	move.Input.GameID, err = strconv.ParseInt(gameID, 10, 64)
+	move.SavedGameDetail.GameID, err = strconv.ParseInt(gameID, 10, 64)
 	if err != nil {
 		return move, poc.Error{Actual: err, Category: poc.MalformedError}
 	}
@@ -114,7 +114,7 @@ func (params V1HydrateURLAndQueryParams) CallListGames(ctx context.Context, curs
 	if err != nil {
 		return cursor, poc.Error{Actual: fmt.Errorf("parsing url param %#v: %w", params.LimitKey, err), Category: poc.MalformedError}
 	}
-	cursor.Input.Offset = int32(offset)
-	cursor.Input.Limit = int32(limit)
+	cursor.Cursor.Offset = int32(offset)
+	cursor.Cursor.Limit = int32(limit)
 	return cursor, nil
 }

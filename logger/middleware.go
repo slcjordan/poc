@@ -81,10 +81,10 @@ func (v Values) MarshalJSON() ([]byte, error) {
 	}{
 		Message:                             v.Message,
 		NumBytes:                            len(v.Bytes),
-		StartGameVariantMaxTimesThroughDeck: v.StartGame.Input.MaxTimesThroughDeck,
-		PerformMoveGameID:                   v.PerformMove.Input.GameID,
-		PerformMoveNumCardsToMove:           len(v.PerformMove.Input.Move),
-		ListGamesOffset:                     v.ListGames.Input.Offset,
-		ListGamesLimit:                      v.ListGames.Input.Limit,
+		StartGameVariantMaxTimesThroughDeck: v.StartGame.Variant.MaxTimesThroughDeck,
+		PerformMoveGameID:                   v.PerformMove.SavedGameDetail.GameID,
+		PerformMoveNumCardsToMove:           len(v.PerformMove.Next),
+		ListGamesOffset:                     v.ListGames.Cursor.Offset,
+		ListGamesLimit:                      v.ListGames.Cursor.Limit,
 	})
 }

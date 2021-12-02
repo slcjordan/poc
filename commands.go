@@ -6,8 +6,8 @@ import "context"
 
 // StartGame starts a game.
 type StartGame struct {
-	Input  Variant
-	Result SavedGameDetail
+	Variant         Variant
+	SavedGameDetail SavedGameDetail
 }
 
 // StartGameCaller is a start game command.
@@ -17,11 +17,8 @@ type StartGameCaller interface {
 
 // PerformMove executes a move on a game.
 type PerformMove struct {
-	Input struct {
-		GameID int64
-		Move   []Move
-	}
-	Result SavedGameDetail
+	Next            []Move
+	SavedGameDetail SavedGameDetail
 }
 
 // PerformMoveCaller is a perform move command.
@@ -31,11 +28,11 @@ type PerformMoveCaller interface {
 
 // ListGames lists running games.
 type ListGames struct {
-	Input struct {
+	Cursor struct {
 		Offset int32
 		Limit  int32
 	}
-	Result []SavedGameSummary
+	Games []SavedGameSummary
 }
 
 // ListGamesCaller is a list game command.

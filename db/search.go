@@ -23,17 +23,17 @@ func (s *Search) CallListGames(ctx context.Context, list poc.ListGames) (poc.Lis
 	}
 	defer conn.Release()
 	rows, err := sqlc.New(conn).SearchGame(ctx, sqlc.SearchGameParams{
-		Limit:  list.Input.Limit,
-		Offset: list.Input.Offset,
+		Limit:  list.Cursor.Limit,
+		Offset: list.Cursor.Offset,
 	})
 	if err != nil {
 		logger.Errorf(ctx, "could not list games: %s", err)
 		return list, poc.Error{Actual: errors.New("could not list games"), Category: poc.UnknownError}
 	}
-	list.Result = make([]poc.SavedGameSummary, len(rows))
+	list.Games = make([]poc.SavedGameSummary, len(rows))
 	for i, row := range rows {
-		list.Result[i].Score = row.Score
-		list.Result[i].GameID = row.ID
+		list.Games[i].Score = row.Score
+		list.Games[i].GameID = row.ID
 	}
 	return list, nil
 }

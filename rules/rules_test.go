@@ -41,10 +41,10 @@ func TestNextMoves(t *testing.T) {
 				rules.NextMove{},
 			},
 			Input: poc.StartGame{
-				Input: poc.Variant{
+				Variant: poc.Variant{
 					MaxTimesThroughDeck: 1,
 				},
-				Result: poc.SavedGameDetail{
+				SavedGameDetail: poc.SavedGameDetail{
 					History: [][]poc.Move{
 						{
 							{

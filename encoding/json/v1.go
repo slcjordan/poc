@@ -113,7 +113,7 @@ func (v V1) DecodeStartGame(b []byte) (poc.StartGame, error) {
 		return poc.StartGame{}, err
 	}
 	return poc.StartGame{
-		Input: poc.Variant{
+		Variant: poc.Variant{
 			MaxTimesThroughDeck: variant.MaxTimesThroughDeck,
 		},
 	}, nil
@@ -121,7 +121,7 @@ func (v V1) DecodeStartGame(b []byte) (poc.StartGame, error) {
 
 // EncodeStartGame marshals start game result.
 func (v V1) EncodeStartGame(started poc.StartGame) ([]byte, error) {
-	result := toV1SavedGame(started.Result)
+	result := toV1SavedGame(started.SavedGameDetail)
 	return json.Marshal(result)
 }
 
@@ -143,13 +143,13 @@ func (v V1) DecodePerformMove(b []byte) (poc.PerformMove, error) {
 		moves[i].NewPilePosition = v1LookupPosition(curr.NewPilePosition)
 	}
 	var result poc.PerformMove
-	result.Input.Move = moves
+	result.Next = moves
 	return result, nil
 }
 
 // EncodePerformMove marshals perform move result.
 func (v V1) EncodePerformMove(performed poc.PerformMove) ([]byte, error) {
-	result := toV1SavedGame(performed.Result)
+	result := toV1SavedGame(performed.SavedGameDetail)
 	return json.Marshal(result)
 }
 
@@ -164,10 +164,10 @@ func (v V1) EncodeListGames(list poc.ListGames) ([]byte, error) {
 	result := make([]struct {
 		GameID int64 `json:"game_id"`
 		Score  int32 `json:"score"`
-	}, len(list.Result))
-	for i := range list.Result {
-		result[i].GameID = list.Result[i].GameID
-		result[i].Score = list.Result[i].Score
+	}, len(list.Games))
+	for i := range list.Games {
+		result[i].GameID = list.Games[i].GameID
+		result[i].Score = list.Games[i].Score
 	}
 	return json.Marshal(result)
 }

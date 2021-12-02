@@ -87,19 +87,21 @@ type Assert struct {
 // AssertStartGame applies all data assertions to games fields.
 func (a Assert) AssertStartGame(t *testing.T, s poc.StartGame) {
 	if a.GameID != nil {
-		t.Run("gameID", func(t *testing.T) { a.GameID.AssertGameID(t, s.Result.GameID) })
+		t.Run("gameID", func(t *testing.T) { a.GameID.AssertGameID(t, s.SavedGameDetail.GameID) })
 	}
 	if a.Board != nil {
-		t.Run("Board", func(t *testing.T) { a.Board.AssertBoard(t, s.Result.Board) })
+		t.Run("Board", func(t *testing.T) { a.Board.AssertBoard(t, s.SavedGameDetail.Board) })
 	}
 	if a.History != nil {
-		t.Run("History", func(t *testing.T) { a.History.AssertHistory(t, s.Result.History) })
+		t.Run("History", func(t *testing.T) { a.History.AssertHistory(t, s.SavedGameDetail.History) })
 	}
 	if a.PossibleNextMoves != nil {
-		t.Run("PossibleNextMoves", func(t *testing.T) { a.PossibleNextMoves.AssertPossibleNextMoves(t, s.Result.PossibleNextMoves) })
+		t.Run("PossibleNextMoves", func(t *testing.T) {
+			a.PossibleNextMoves.AssertPossibleNextMoves(t, s.SavedGameDetail.PossibleNextMoves)
+		})
 	}
 	if a.Variant != nil {
-		t.Run("Variant", func(t *testing.T) { a.Variant.AssertVariant(t, s.Input) })
+		t.Run("Variant", func(t *testing.T) { a.Variant.AssertVariant(t, s.Variant) })
 	}
 }
 

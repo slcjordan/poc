@@ -22,9 +22,9 @@ func (l *Lookup) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc
 		return move, poc.Error{Actual: errors.New("db unavailable"), Category: poc.UnavailableError}
 	}
 	defer conn.Release()
-	_, err = sqlc.New(conn).LookupGameDetail(ctx, move.Input.GameID)
+	_, err = sqlc.New(conn).LookupGameDetail(ctx, move.SavedGameDetail.GameID)
 	if err != nil {
-		logger.Errorf(ctx, "could not lookup game %d: %s", move.Input.GameID, err)
+		logger.Errorf(ctx, "could not lookup game %d: %s", move.SavedGameDetail.GameID, err)
 		return move, poc.Error{Actual: errors.New("could not find game"), Category: poc.UnknownError}
 	}
 	return move, nil

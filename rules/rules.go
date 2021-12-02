@@ -248,17 +248,17 @@ type Validate struct{}
 func (v Validate) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.PerformMove, error) {
 	// get list of possible moves
 	possible := nextMoves(
-		move.Result.Board.Piles[0],
-		move.Result.Board.Piles[1],
-		move.Result.Board.Piles[2:9],
-		move.Result.Board.Piles[9:],
+		move.SavedGameDetail.Board.Piles[0],
+		move.SavedGameDetail.Board.Piles[1],
+		move.SavedGameDetail.Board.Piles[2:9],
+		move.SavedGameDetail.Board.Piles[9:],
 	)
 	// sort everything
 	for i := 0; i < len(possible); i++ {
 		curr := sortable(possible[i])
 		sort.Sort(&curr)
 	}
-	input := sortable(move.Input.Move)
+	input := sortable(move.Next)
 	sort.Sort(&input)
 	sort.Slice(possible, func(i int, j int) bool {
 		a := sortable(possible[i])
@@ -287,7 +287,7 @@ type NextMove struct{}
 func (n NextMove) CallStartGame(ctx context.Context, game poc.StartGame) (poc.StartGame, error) {
 	var timesThroughDeck int32
 outer:
-	for _, currMove := range game.Result.History {
+	for _, currMove := range game.SavedGameDetail.History {
 		for _, currCard := range currMove {
 			if currCard.NewPileNum == 0 {
 				timesThroughDeck++
@@ -295,26 +295,26 @@ outer:
 			}
 		}
 	}
-	if timesThroughDeck >= game.Input.MaxTimesThroughDeck && game.Input.MaxTimesThroughDeck > 0 {
-		game.Result.PossibleNextMoves = nil
+	if timesThroughDeck >= game.Variant.MaxTimesThroughDeck && game.Variant.MaxTimesThroughDeck > 0 {
+		game.SavedGameDetail.PossibleNextMoves = nil
 		return game, nil
 	}
-	game.Result.PossibleNextMoves = nextMoves(
-		game.Result.Board.Piles[0],
-		game.Result.Board.Piles[1],
-		game.Result.Board.Piles[2:9],
-		game.Result.Board.Piles[9:],
+	game.SavedGameDetail.PossibleNextMoves = nextMoves(
+		game.SavedGameDetail.Board.Piles[0],
+		game.SavedGameDetail.Board.Piles[1],
+		game.SavedGameDetail.Board.Piles[2:9],
+		game.SavedGameDetail.Board.Piles[9:],
 	)
 	return game, nil
 }
 
 // CallPerformMove moves.
 func (n NextMove) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.PerformMove, error) {
-	move.Result.PossibleNextMoves = nextMoves(
-		move.Result.Board.Piles[0],
-		move.Result.Board.Piles[1],
-		move.Result.Board.Piles[2:9],
-		move.Result.Board.Piles[9:],
+	move.SavedGameDetail.PossibleNextMoves = nextMoves(
+		move.SavedGameDetail.Board.Piles[0],
+		move.SavedGameDetail.Board.Piles[1],
+		move.SavedGameDetail.Board.Piles[2:9],
+		move.SavedGameDetail.Board.Piles[9:],
 	)
 	return move, nil
 }
@@ -333,13 +333,13 @@ func (s Shuffle) CallStartGame(ctx context.Context, game poc.StartGame) (poc.Sta
 	swap := func(i int, j int) { cards[i], cards[j] = cards[j], cards[i] }
 	rand.New(s.Source).Shuffle(len(cards), swap)
 
-	game.Result.Board.Piles[8] = cards[21:28]
-	game.Result.Board.Piles[7] = cards[15:21]
-	game.Result.Board.Piles[6] = cards[10:15]
-	game.Result.Board.Piles[5] = cards[6:10]
-	game.Result.Board.Piles[4] = cards[3:6]
-	game.Result.Board.Piles[3] = cards[1:3]
-	game.Result.Board.Piles[2] = cards[:1]
-	game.Result.Board.Piles[0] = cards[28:]
+	game.SavedGameDetail.Board.Piles[8] = cards[21:28]
+	game.SavedGameDetail.Board.Piles[7] = cards[15:21]
+	game.SavedGameDetail.Board.Piles[6] = cards[10:15]
+	game.SavedGameDetail.Board.Piles[5] = cards[6:10]
+	game.SavedGameDetail.Board.Piles[4] = cards[3:6]
+	game.SavedGameDetail.Board.Piles[3] = cards[1:3]
+	game.SavedGameDetail.Board.Piles[2] = cards[:1]
+	game.SavedGameDetail.Board.Piles[0] = cards[28:]
 	return game, nil
 }

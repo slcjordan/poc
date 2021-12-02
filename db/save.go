@@ -41,7 +41,7 @@ func (s *Save) CallStartGame(ctx context.Context, start poc.StartGame) (poc.Star
 	var indexes []int16
 	var positions []int32
 
-	for pileNum, curr := range start.Result.Board.Piles {
+	for pileNum, curr := range start.SavedGameDetail.Board.Piles {
 		for pileIndex, card := range curr {
 			pileNums = append(pileNums, int16(pileNum))
 			pileIndexes = append(pileIndexes, int16(pileIndex))
@@ -51,19 +51,19 @@ func (s *Save) CallStartGame(ctx context.Context, start poc.StartGame) (poc.Star
 		}
 	}
 	gameID, err := sqlc.New(conn).SaveStartGame(ctx, sqlc.SaveStartGameParams{
-		Score:               start.Result.Board.Score,
+		Score:               start.SavedGameDetail.Board.Score,
 		PileNums:            pileNums,
 		PileIndexes:         pileIndexes,
 		Suits:               suits,
 		Indexes:             indexes,
 		Positions:           positions,
-		MaxTimesThroughDeck: start.Result.Variant.MaxTimesThroughDeck,
+		MaxTimesThroughDeck: start.SavedGameDetail.Variant.MaxTimesThroughDeck,
 	})
 	if err != nil {
 		logger.Errorf(ctx, "could not save game: %s", err)
 		return start, poc.Error{Actual: errors.New("could not save game"), Category: poc.UnknownError}
 	}
-	start.Result.GameID = gameID
+	start.SavedGameDetail.GameID = gameID
 	return start, nil
 }
 
@@ -74,14 +74,14 @@ func (s *Save) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.P
 		logger.Infof(ctx, "could not acquire connection: %s", err)
 		return move, poc.Error{Actual: errors.New("db unavailable"), Category: poc.UnavailableError}
 	}
-	oldPileNums := make([]int, len(move.Input.Move))
-	oldPileIndexes := make([]int, len(move.Input.Move))
-	oldPilePositions := make([]uint64, len(move.Input.Move))
-	newPileNums := make([]int, len(move.Input.Move))
-	newPileIndexes := make([]int, len(move.Input.Move))
-	newPilePositions := make([]uint64, len(move.Input.Move))
+	oldPileNums := make([]int, len(move.Next))
+	oldPileIndexes := make([]int, len(move.Next))
+	oldPilePositions := make([]uint64, len(move.Next))
+	newPileNums := make([]int, len(move.Next))
+	newPileIndexes := make([]int, len(move.Next))
+	newPilePositions := make([]uint64, len(move.Next))
 
-	for i, curr := range move.Input.Move {
+	for i, curr := range move.Next {
 		oldPileNums[i] = curr.OldPileNum
 		oldPileIndexes[i] = curr.OldPileIndex
 		oldPilePositions[i] = uint64(curr.OldPilePosition)
@@ -90,7 +90,7 @@ func (s *Save) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.P
 		newPilePositions[i] = uint64(curr.NewPilePosition)
 	}
 	_, err = sqlc.New(conn).SavePerformMove(ctx, sqlc.SavePerformMoveParams{
-		GameID:           move.Input.GameID,
+		GameID:           move.SavedGameDetail.GameID,
 		OldPileNums:      oldPileNums,
 		OldPileIndexes:   oldPileIndexes,
 		OldPilePositions: oldPilePositions,
@@ -99,7 +99,7 @@ func (s *Save) CallPerformMove(ctx context.Context, move poc.PerformMove) (poc.P
 		NewPilePositions: newPilePositions,
 	})
 	if err != nil {
-		logger.Errorf(ctx, "could not save game %d: %s", move.Input.GameID, err)
+		logger.Errorf(ctx, "could not save game %d: %s", move.SavedGameDetail.GameID, err)
 		return move, poc.Error{Actual: errors.New("could not save game"), Category: poc.UnknownError}
 	}
 	return move, nil
