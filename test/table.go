@@ -50,14 +50,16 @@ type Category struct {
 
 // AssertError will only pass if not nil and of correct category.
 func (c Category) AssertError(t *testing.T, err error) {
-	var categorized poc.Error
-	if !errors.As(err, &categorized) {
-		t.Fatalf("Error of type %T does not wrap nor is of type poc.Error: %s", err, err)
-	}
-	actual := categorized.Category
-	if actual != c.Expected {
-		t.Fatalf("Expected error of category %s but got %s", c.Expected, actual)
-	}
+	t.Run("error category", func(t *testing.T) {
+		var categorized poc.Error
+		if !errors.As(err, &categorized) {
+			t.Fatalf("Error of type %T does not wrap nor is of type poc.Error: %s", err, err)
+		}
+		actual := categorized.Category
+		if actual != c.Expected {
+			t.Fatalf("Expected error of category %s but got %s", c.Expected, actual)
+		}
+	})
 }
 
 // IsNil fails if error is not nil.
@@ -65,9 +67,11 @@ type IsNil struct{}
 
 // AssertError will only pass if not nil and of correct category.
 func (i IsNil) AssertError(t *testing.T, err error) {
-	if err != nil {
-		t.Fatalf("Error of type %T is not nil: %s", err, err)
-	}
+	t.Run("error is nil", func(t *testing.T) {
+		if err != nil {
+			t.Fatalf("Error of type %T is not nil: %s", err, err)
+		}
+	})
 }
 
 // Assert makes assertions from game attributes.
