@@ -28,6 +28,7 @@ func NewSaveTestPool(t *testing.T, err error) *mocks.MockPool {
 	conn.EXPECT().QueryRow(
 		gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(),
 	).Return(mockRow{err})
+	conn.EXPECT().Release()
 	pool.
 		EXPECT().
 		Acquire(gomock.Any()).

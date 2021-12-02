@@ -29,7 +29,6 @@ func TestNextMoves(t *testing.T) {
 				rules.Shuffle{rand.NewSource(0)},
 				rules.NextMove{},
 			},
-			Error: test.IsNil{},
 			Result: test.Assert{
 				PossibleNextMoves: test.Length(test.Eq(8)),
 			},
