@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/slcjordan/poc"
 	"github.com/slcjordan/poc/pipeline"
 	"github.com/slcjordan/poc/rules"
 	"github.com/slcjordan/poc/test"
@@ -31,6 +32,30 @@ func TestNextMoves(t *testing.T) {
 			},
 			Result: test.Assert{
 				PossibleNextMoves: test.Length(test.Eq(8)),
+			},
+		},
+		{
+			Desc: "cannot move more than max times through deck",
+			Command: pipeline.StartGame{
+				rules.Shuffle{rand.NewSource(0)},
+				rules.NextMove{},
+			},
+			Input: poc.StartGame{
+				Input: poc.Variant{
+					MaxTimesThroughDeck: 1,
+				},
+				Result: poc.SavedGameDetail{
+					History: [][]poc.Move{
+						{
+							{
+								NewPileNum: 0, // talon has already been returned to the stock once
+							},
+						},
+					},
+				},
+			},
+			Result: test.Assert{
+				PossibleNextMoves: test.Length(test.Eq(0)),
 			},
 		},
 	}.Run(t)

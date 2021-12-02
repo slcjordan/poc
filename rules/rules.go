@@ -285,6 +285,20 @@ type NextMove struct{}
 
 // CallStartGame moves.
 func (n NextMove) CallStartGame(ctx context.Context, game poc.StartGame) (poc.StartGame, error) {
+	var timesThroughDeck int32
+outer:
+	for _, currMove := range game.Result.History {
+		for _, currCard := range currMove {
+			if currCard.NewPileNum == 0 {
+				timesThroughDeck++
+				continue outer
+			}
+		}
+	}
+	if timesThroughDeck >= game.Input.MaxTimesThroughDeck && game.Input.MaxTimesThroughDeck > 0 {
+		game.Result.PossibleNextMoves = nil
+		return game, nil
+	}
 	game.Result.PossibleNextMoves = nextMoves(
 		game.Result.Board.Piles[0],
 		game.Result.Board.Piles[1],
