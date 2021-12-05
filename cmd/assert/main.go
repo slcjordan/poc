@@ -152,8 +152,8 @@ func New() *Assertion {
 		mw.Fprintf(`
 
 func (a *Assertion) %s(t *testing.T, desc string, val %s){
-	a.%s.%s(t, desc, val)
-}`, interfaceMethodName(parent), maybeQualify(parent), parent, interfaceMethodName(parent))
+	a.%s.%s(t, desc+" %s", val)
+}`, interfaceMethodName(parent), maybeQualify(parent), parent, interfaceMethodName(parent), parent)
 	}
 
 	for _, parent := range parents {

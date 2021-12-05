@@ -2,6 +2,8 @@ package poc
 
 import "context"
 
+//go:generate build/harness -filename=command.go
+
 //go:generate go run github.com/golang/mock/mockgen -package=mocks -destination=test/mocks/command.go -source=command.go
 
 // StartGameCaller is a start game command.
