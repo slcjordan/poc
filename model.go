@@ -1,5 +1,7 @@
 package poc
 
+//go:generate build/assert -filename=model.go
+
 // Suit is a the pip part of the card.
 //go:generate stringer -type=Suit
 type Suit uint8
@@ -79,8 +81,7 @@ type Move struct {
 	NewPilePosition Position
 }
 
-// History is a record of moves.
-type History [][]Move
+/* Service objects */
 
 // SavedGameSummary is a saved game with summary of the game state.
 type SavedGameSummary struct {
@@ -92,7 +93,28 @@ type SavedGameSummary struct {
 type SavedGameDetail struct {
 	GameID            int64
 	Board             Board
-	History           History
+	History           [][]Move
 	PossibleNextMoves [][]Move
 	Variant           Variant
+}
+
+// StartGame starts a game.
+type StartGame struct {
+	Variant         Variant
+	SavedGameDetail SavedGameDetail
+}
+
+// PerformMove executes a move on a game.
+type PerformMove struct {
+	Next            []Move
+	SavedGameDetail SavedGameDetail
+}
+
+// ListGames lists running games.
+type ListGames struct {
+	Cursor struct {
+		Offset int32
+		Limit  int32
+	}
+	Games []SavedGameSummary
 }

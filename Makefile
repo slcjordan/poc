@@ -89,7 +89,7 @@ start-services: build/.empty-targets/network
 		--volume ${PWD}/data:/var/lib/postgresql/data \
 		postgres:${POSTGRES_VERSION}
 
-build/.empty-targets/generate: ${GO_GENERATE_DEPS}
+build/.empty-targets/generate: ${GO_GENERATE_DEPS} build/assert
 	@mkdir -p test
 	@echo "(re)generating mocks"
 	- rm test/mocks/*
@@ -162,3 +162,15 @@ build/.empty-targets/sqlc: ${SQLC_DEPS}
 		kjconroy/sqlc:${SQLC_VERSION} generate
 	@mkdir -p $(@D)
 	@touch $@
+
+build/assert: cmd/assert/main.go
+	docker run \
+		--interactive \
+		--tty \
+		--network poc-demo \
+		--publish 8321:8321 \
+		--env DB_CONN_STRING=${DB_CONN_STRING} \
+		--env HTTP_LISTEN_ADDRESS=${HTTP_LISTEN_ADDRESS} \
+		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
+		--workdir /go/src/github.com/slcjordan/poc/cmd/assert \
+		golang:${GO_VERSION} go build -o ../../build/assert
