@@ -9,50 +9,49 @@ import (
 )
 
 type Error struct {
-	assertion *Assertion
+	assertion      *Assertion
 	actualCheckers []ErrorChecker
 
 	Category ErrorCategory
 }
 
 func newError(assertion *Assertion) Error {
-	return Error {
+	return Error{
 		assertion: assertion,
-		Category: newErrorCategory(assertion),
+		Category:  newErrorCategory(assertion),
 	}
 }
 
-func(parent *Error) Actual(checkers ...ErrorChecker) *Assertion {
+func (parent *Error) Actual(checkers ...ErrorChecker) *Assertion {
 	parent.actualCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *Error) CheckError(t *testing.T, desc string, val poc.Error) {
-	for _, checker := range  parent.actualCheckers {
-		checker.CheckError(t, desc + ".Actual", val.Actual)
+func (parent *Error) CheckError(t *testing.T, desc string, val poc.Error) {
+	for _, checker := range parent.actualCheckers {
+		checker.CheckError(t, desc+".Actual", val.Actual)
 	}
-	parent.Category.CheckErrorCategory(t, desc + ".Category", val.Category)
+	parent.Category.CheckErrorCategory(t, desc+".Category", val.Category)
 }
 
 type ErrorCategory struct {
-	assertion *Assertion
+	assertion     *Assertion
 	uint8Checkers []Uint8Checker
-
 }
 
 func newErrorCategory(assertion *Assertion) ErrorCategory {
-	return ErrorCategory {
+	return ErrorCategory{
 		assertion: assertion,
 	}
 }
 
-func(parent *ErrorCategory) Uint8(checkers ...Uint8Checker) *Assertion {
+func (parent *ErrorCategory) Uint8(checkers ...Uint8Checker) *Assertion {
 	parent.uint8Checkers = checkers
 	return parent.assertion
 }
 
-func(parent *ErrorCategory) CheckErrorCategory(t *testing.T, desc string, val poc.ErrorCategory) {
-	for _, checker := range  parent.uint8Checkers {
-		checker.CheckUint8(t, desc + ".uint8", uint8(val))
+func (parent *ErrorCategory) CheckErrorCategory(t *testing.T, desc string, val poc.ErrorCategory) {
+	for _, checker := range parent.uint8Checkers {
+		checker.CheckUint8(t, desc+".uint8", uint8(val))
 	}
 }

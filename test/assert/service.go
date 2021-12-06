@@ -3,131 +3,130 @@
 package assert
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 
 	"github.com/slcjordan/poc"
 )
 
 type ListGames struct {
-	assertion *Assertion
-	cursorLimitCheckers []Int32Checker
+	assertion            *Assertion
+	cursorLimitCheckers  []Int32Checker
 	cursorOffsetCheckers []Int32Checker
 
 	Games SavedGameSummaryArray1D
 }
 
 func newListGames(assertion *Assertion) ListGames {
-	return ListGames {
+	return ListGames{
 		assertion: assertion,
-		Games: newSavedGameSummaryArray1D(assertion),
+		Games:     newSavedGameSummaryArray1D(assertion),
 	}
 }
 
-func(parent *ListGames) CursorLimit(checkers ...Int32Checker) *Assertion {
+func (parent *ListGames) CursorLimit(checkers ...Int32Checker) *Assertion {
 	parent.cursorLimitCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *ListGames) CursorOffset(checkers ...Int32Checker) *Assertion {
+func (parent *ListGames) CursorOffset(checkers ...Int32Checker) *Assertion {
 	parent.cursorOffsetCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *ListGames) CheckListGames(t *testing.T, desc string, val poc.ListGames) {
-	for _, checker := range  parent.cursorLimitCheckers {
-		checker.CheckInt32(t, desc + ".Cursor.Limit", val.Cursor.Limit)
+func (parent *ListGames) CheckListGames(t *testing.T, desc string, val poc.ListGames) {
+	for _, checker := range parent.cursorLimitCheckers {
+		checker.CheckInt32(t, desc+".Cursor.Limit", val.Cursor.Limit)
 	}
-	for _, checker := range  parent.cursorOffsetCheckers {
-		checker.CheckInt32(t, desc + ".Cursor.Offset", val.Cursor.Offset)
+	for _, checker := range parent.cursorOffsetCheckers {
+		checker.CheckInt32(t, desc+".Cursor.Offset", val.Cursor.Offset)
 	}
-	parent.Games.CheckSavedGameSummaryArray1D(t, desc + ".Games", val.Games)
+	parent.Games.CheckSavedGameSummaryArray1D(t, desc+".Games", val.Games)
 }
 
 type PerformMove struct {
 	assertion *Assertion
 
-	Next MoveArray1D
+	Next            MoveArray1D
 	SavedGameDetail SavedGameDetail
 }
 
 func newPerformMove(assertion *Assertion) PerformMove {
-	return PerformMove {
-		assertion: assertion,
-		Next: newMoveArray1D(assertion),
+	return PerformMove{
+		assertion:       assertion,
+		Next:            newMoveArray1D(assertion),
 		SavedGameDetail: newSavedGameDetail(assertion),
 	}
 }
 
-func(parent *PerformMove) CheckPerformMove(t *testing.T, desc string, val poc.PerformMove) {
-	parent.Next.CheckMoveArray1D(t, desc + ".Next", val.Next)
-	parent.SavedGameDetail.CheckSavedGameDetail(t, desc + ".SavedGameDetail", val.SavedGameDetail)
+func (parent *PerformMove) CheckPerformMove(t *testing.T, desc string, val poc.PerformMove) {
+	parent.Next.CheckMoveArray1D(t, desc+".Next", val.Next)
+	parent.SavedGameDetail.CheckSavedGameDetail(t, desc+".SavedGameDetail", val.SavedGameDetail)
 }
 
 type SavedGameDetail struct {
-	assertion *Assertion
+	assertion      *Assertion
 	gameIDCheckers []Int64Checker
 
-	Board Board
-	History MoveArray2D
+	Board             Board
+	History           MoveArray2D
 	PossibleNextMoves MoveArray2D
-	Variant Variant
+	Variant           Variant
 }
 
 func newSavedGameDetail(assertion *Assertion) SavedGameDetail {
-	return SavedGameDetail {
-		assertion: assertion,
-		Board: newBoard(assertion),
-		History: newMoveArray2D(assertion),
+	return SavedGameDetail{
+		assertion:         assertion,
+		Board:             newBoard(assertion),
+		History:           newMoveArray2D(assertion),
 		PossibleNextMoves: newMoveArray2D(assertion),
-		Variant: newVariant(assertion),
+		Variant:           newVariant(assertion),
 	}
 }
 
-func(parent *SavedGameDetail) GameID(checkers ...Int64Checker) *Assertion {
+func (parent *SavedGameDetail) GameID(checkers ...Int64Checker) *Assertion {
 	parent.gameIDCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *SavedGameDetail) CheckSavedGameDetail(t *testing.T, desc string, val poc.SavedGameDetail) {
-	for _, checker := range  parent.gameIDCheckers {
-		checker.CheckInt64(t, desc + ".GameID", val.GameID)
+func (parent *SavedGameDetail) CheckSavedGameDetail(t *testing.T, desc string, val poc.SavedGameDetail) {
+	for _, checker := range parent.gameIDCheckers {
+		checker.CheckInt64(t, desc+".GameID", val.GameID)
 	}
-	parent.Board.CheckBoard(t, desc + ".Board", val.Board)
-	parent.History.CheckMoveArray2D(t, desc + ".History", val.History)
-	parent.PossibleNextMoves.CheckMoveArray2D(t, desc + ".PossibleNextMoves", val.PossibleNextMoves)
-	parent.Variant.CheckVariant(t, desc + ".Variant", val.Variant)
+	parent.Board.CheckBoard(t, desc+".Board", val.Board)
+	parent.History.CheckMoveArray2D(t, desc+".History", val.History)
+	parent.PossibleNextMoves.CheckMoveArray2D(t, desc+".PossibleNextMoves", val.PossibleNextMoves)
+	parent.Variant.CheckVariant(t, desc+".Variant", val.Variant)
 }
 
 type SavedGameSummary struct {
-	assertion *Assertion
+	assertion      *Assertion
 	gameIDCheckers []Int64Checker
-	scoreCheckers []Int32Checker
-
+	scoreCheckers  []Int32Checker
 }
 
 func newSavedGameSummary(assertion *Assertion) SavedGameSummary {
-	return SavedGameSummary {
+	return SavedGameSummary{
 		assertion: assertion,
 	}
 }
 
-func(parent *SavedGameSummary) GameID(checkers ...Int64Checker) *Assertion {
+func (parent *SavedGameSummary) GameID(checkers ...Int64Checker) *Assertion {
 	parent.gameIDCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *SavedGameSummary) Score(checkers ...Int32Checker) *Assertion {
+func (parent *SavedGameSummary) Score(checkers ...Int32Checker) *Assertion {
 	parent.scoreCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *SavedGameSummary) CheckSavedGameSummary(t *testing.T, desc string, val poc.SavedGameSummary) {
-	for _, checker := range  parent.gameIDCheckers {
-		checker.CheckInt64(t, desc + ".GameID", val.GameID)
+func (parent *SavedGameSummary) CheckSavedGameSummary(t *testing.T, desc string, val poc.SavedGameSummary) {
+	for _, checker := range parent.gameIDCheckers {
+		checker.CheckInt64(t, desc+".GameID", val.GameID)
 	}
-	for _, checker := range  parent.scoreCheckers {
-		checker.CheckInt32(t, desc + ".Score", val.Score)
+	for _, checker := range parent.scoreCheckers {
+		checker.CheckInt32(t, desc+".Score", val.Score)
 	}
 }
 
@@ -135,20 +134,20 @@ type StartGame struct {
 	assertion *Assertion
 
 	SavedGameDetail SavedGameDetail
-	Variant Variant
+	Variant         Variant
 }
 
 func newStartGame(assertion *Assertion) StartGame {
-	return StartGame {
-		assertion: assertion,
+	return StartGame{
+		assertion:       assertion,
 		SavedGameDetail: newSavedGameDetail(assertion),
-		Variant: newVariant(assertion),
+		Variant:         newVariant(assertion),
 	}
 }
 
-func(parent *StartGame) CheckStartGame(t *testing.T, desc string, val poc.StartGame) {
-	parent.SavedGameDetail.CheckSavedGameDetail(t, desc + ".SavedGameDetail", val.SavedGameDetail)
-	parent.Variant.CheckVariant(t, desc + ".Variant", val.Variant)
+func (parent *StartGame) CheckStartGame(t *testing.T, desc string, val poc.StartGame) {
+	parent.SavedGameDetail.CheckSavedGameDetail(t, desc+".SavedGameDetail", val.SavedGameDetail)
+	parent.Variant.CheckVariant(t, desc+".Variant", val.Variant)
 }
 
 type SavedGameSummaryArray1D struct {
@@ -160,7 +159,7 @@ type SavedGameSummaryArray1D struct {
 }
 
 func newSavedGameSummaryArray1D(assertion *Assertion) SavedGameSummaryArray1D {
-	return SavedGameSummaryArray1D {
+	return SavedGameSummaryArray1D{
 		assertion: assertion,
 		nth:       make(map[int]SavedGameSummary),
 		ForEach:   newSavedGameSummary(assertion),
@@ -203,7 +202,7 @@ type MoveArray1D struct {
 }
 
 func newMoveArray1D(assertion *Assertion) MoveArray1D {
-	return MoveArray1D {
+	return MoveArray1D{
 		assertion: assertion,
 		nth:       make(map[int]Move),
 		ForEach:   newMove(assertion),
@@ -246,7 +245,7 @@ type MoveArray2D struct {
 }
 
 func newMoveArray2D(assertion *Assertion) MoveArray2D {
-	return MoveArray2D {
+	return MoveArray2D{
 		assertion: assertion,
 		nth:       make(map[int]MoveArray1D),
 		ForEach:   newMoveArray1D(assertion),

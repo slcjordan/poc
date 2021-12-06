@@ -3,223 +3,219 @@
 package assert
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 
 	"github.com/slcjordan/poc"
 )
 
 type Board struct {
-	assertion *Assertion
+	assertion     *Assertion
 	scoreCheckers []Int32Checker
 
 	Piles PositionedCardArray2D
 }
 
 func newBoard(assertion *Assertion) Board {
-	return Board {
+	return Board{
 		assertion: assertion,
-		Piles: newPositionedCardArray2D(assertion),
+		Piles:     newPositionedCardArray2D(assertion),
 	}
 }
 
-func(parent *Board) Score(checkers ...Int32Checker) *Assertion {
+func (parent *Board) Score(checkers ...Int32Checker) *Assertion {
 	parent.scoreCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *Board) CheckBoard(t *testing.T, desc string, val poc.Board) {
-	for _, checker := range  parent.scoreCheckers {
-		checker.CheckInt32(t, desc + ".Score", val.Score)
+func (parent *Board) CheckBoard(t *testing.T, desc string, val poc.Board) {
+	for _, checker := range parent.scoreCheckers {
+		checker.CheckInt32(t, desc+".Score", val.Score)
 	}
-	parent.Piles.CheckPositionedCardArray2D(t, desc + ".Piles", val.Piles)
+	parent.Piles.CheckPositionedCardArray2D(t, desc+".Piles", val.Piles)
 }
 
 type Card struct {
 	assertion *Assertion
 
 	Index Index
-	Suit Suit
+	Suit  Suit
 }
 
 func newCard(assertion *Assertion) Card {
-	return Card {
+	return Card{
 		assertion: assertion,
-		Index: newIndex(assertion),
-		Suit: newSuit(assertion),
+		Index:     newIndex(assertion),
+		Suit:      newSuit(assertion),
 	}
 }
 
-func(parent *Card) CheckCard(t *testing.T, desc string, val poc.Card) {
-	parent.Index.CheckIndex(t, desc + ".Index", val.Index)
-	parent.Suit.CheckSuit(t, desc + ".Suit", val.Suit)
+func (parent *Card) CheckCard(t *testing.T, desc string, val poc.Card) {
+	parent.Index.CheckIndex(t, desc+".Index", val.Index)
+	parent.Suit.CheckSuit(t, desc+".Suit", val.Suit)
 }
 
 type Index struct {
-	assertion *Assertion
+	assertion     *Assertion
 	uint8Checkers []Uint8Checker
-
 }
 
 func newIndex(assertion *Assertion) Index {
-	return Index {
+	return Index{
 		assertion: assertion,
 	}
 }
 
-func(parent *Index) Uint8(checkers ...Uint8Checker) *Assertion {
+func (parent *Index) Uint8(checkers ...Uint8Checker) *Assertion {
 	parent.uint8Checkers = checkers
 	return parent.assertion
 }
 
-func(parent *Index) CheckIndex(t *testing.T, desc string, val poc.Index) {
-	for _, checker := range  parent.uint8Checkers {
-		checker.CheckUint8(t, desc + ".uint8", uint8(val))
+func (parent *Index) CheckIndex(t *testing.T, desc string, val poc.Index) {
+	for _, checker := range parent.uint8Checkers {
+		checker.CheckUint8(t, desc+".uint8", uint8(val))
 	}
 }
 
 type Move struct {
-	assertion *Assertion
+	assertion            *Assertion
 	newPileIndexCheckers []IntChecker
-	newPileNumCheckers []IntChecker
+	newPileNumCheckers   []IntChecker
 	oldPileIndexCheckers []IntChecker
-	oldPileNumCheckers []IntChecker
+	oldPileNumCheckers   []IntChecker
 
 	NewPilePosition Position
 	OldPilePosition Position
 }
 
 func newMove(assertion *Assertion) Move {
-	return Move {
-		assertion: assertion,
+	return Move{
+		assertion:       assertion,
 		NewPilePosition: newPosition(assertion),
 		OldPilePosition: newPosition(assertion),
 	}
 }
 
-func(parent *Move) NewPileIndex(checkers ...IntChecker) *Assertion {
+func (parent *Move) NewPileIndex(checkers ...IntChecker) *Assertion {
 	parent.newPileIndexCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *Move) NewPileNum(checkers ...IntChecker) *Assertion {
+func (parent *Move) NewPileNum(checkers ...IntChecker) *Assertion {
 	parent.newPileNumCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *Move) OldPileIndex(checkers ...IntChecker) *Assertion {
+func (parent *Move) OldPileIndex(checkers ...IntChecker) *Assertion {
 	parent.oldPileIndexCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *Move) OldPileNum(checkers ...IntChecker) *Assertion {
+func (parent *Move) OldPileNum(checkers ...IntChecker) *Assertion {
 	parent.oldPileNumCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *Move) CheckMove(t *testing.T, desc string, val poc.Move) {
-	for _, checker := range  parent.newPileIndexCheckers {
-		checker.CheckInt(t, desc + ".NewPileIndex", val.NewPileIndex)
+func (parent *Move) CheckMove(t *testing.T, desc string, val poc.Move) {
+	for _, checker := range parent.newPileIndexCheckers {
+		checker.CheckInt(t, desc+".NewPileIndex", val.NewPileIndex)
 	}
-	for _, checker := range  parent.newPileNumCheckers {
-		checker.CheckInt(t, desc + ".NewPileNum", val.NewPileNum)
+	for _, checker := range parent.newPileNumCheckers {
+		checker.CheckInt(t, desc+".NewPileNum", val.NewPileNum)
 	}
-	for _, checker := range  parent.oldPileIndexCheckers {
-		checker.CheckInt(t, desc + ".OldPileIndex", val.OldPileIndex)
+	for _, checker := range parent.oldPileIndexCheckers {
+		checker.CheckInt(t, desc+".OldPileIndex", val.OldPileIndex)
 	}
-	for _, checker := range  parent.oldPileNumCheckers {
-		checker.CheckInt(t, desc + ".OldPileNum", val.OldPileNum)
+	for _, checker := range parent.oldPileNumCheckers {
+		checker.CheckInt(t, desc+".OldPileNum", val.OldPileNum)
 	}
-	parent.NewPilePosition.CheckPosition(t, desc + ".NewPilePosition", val.NewPilePosition)
-	parent.OldPilePosition.CheckPosition(t, desc + ".OldPilePosition", val.OldPilePosition)
+	parent.NewPilePosition.CheckPosition(t, desc+".NewPilePosition", val.NewPilePosition)
+	parent.OldPilePosition.CheckPosition(t, desc+".OldPilePosition", val.OldPilePosition)
 }
 
 type Position struct {
-	assertion *Assertion
+	assertion      *Assertion
 	uint64Checkers []Uint64Checker
-
 }
 
 func newPosition(assertion *Assertion) Position {
-	return Position {
+	return Position{
 		assertion: assertion,
 	}
 }
 
-func(parent *Position) Uint64(checkers ...Uint64Checker) *Assertion {
+func (parent *Position) Uint64(checkers ...Uint64Checker) *Assertion {
 	parent.uint64Checkers = checkers
 	return parent.assertion
 }
 
-func(parent *Position) CheckPosition(t *testing.T, desc string, val poc.Position) {
-	for _, checker := range  parent.uint64Checkers {
-		checker.CheckUint64(t, desc + ".uint64", uint64(val))
+func (parent *Position) CheckPosition(t *testing.T, desc string, val poc.Position) {
+	for _, checker := range parent.uint64Checkers {
+		checker.CheckUint64(t, desc+".uint64", uint64(val))
 	}
 }
 
 type PositionedCard struct {
 	assertion *Assertion
 
-	Card Card
+	Card     Card
 	Position Position
 }
 
 func newPositionedCard(assertion *Assertion) PositionedCard {
-	return PositionedCard {
+	return PositionedCard{
 		assertion: assertion,
-		Card: newCard(assertion),
-		Position: newPosition(assertion),
+		Card:      newCard(assertion),
+		Position:  newPosition(assertion),
 	}
 }
 
-func(parent *PositionedCard) CheckPositionedCard(t *testing.T, desc string, val poc.PositionedCard) {
-	parent.Card.CheckCard(t, desc + ".Card", val.Card)
-	parent.Position.CheckPosition(t, desc + ".Position", val.Position)
+func (parent *PositionedCard) CheckPositionedCard(t *testing.T, desc string, val poc.PositionedCard) {
+	parent.Card.CheckCard(t, desc+".Card", val.Card)
+	parent.Position.CheckPosition(t, desc+".Position", val.Position)
 }
 
 type Suit struct {
-	assertion *Assertion
+	assertion     *Assertion
 	uint8Checkers []Uint8Checker
-
 }
 
 func newSuit(assertion *Assertion) Suit {
-	return Suit {
+	return Suit{
 		assertion: assertion,
 	}
 }
 
-func(parent *Suit) Uint8(checkers ...Uint8Checker) *Assertion {
+func (parent *Suit) Uint8(checkers ...Uint8Checker) *Assertion {
 	parent.uint8Checkers = checkers
 	return parent.assertion
 }
 
-func(parent *Suit) CheckSuit(t *testing.T, desc string, val poc.Suit) {
-	for _, checker := range  parent.uint8Checkers {
-		checker.CheckUint8(t, desc + ".uint8", uint8(val))
+func (parent *Suit) CheckSuit(t *testing.T, desc string, val poc.Suit) {
+	for _, checker := range parent.uint8Checkers {
+		checker.CheckUint8(t, desc+".uint8", uint8(val))
 	}
 }
 
 type Variant struct {
-	assertion *Assertion
+	assertion                   *Assertion
 	maxTimesThroughDeckCheckers []Int32Checker
-
 }
 
 func newVariant(assertion *Assertion) Variant {
-	return Variant {
+	return Variant{
 		assertion: assertion,
 	}
 }
 
-func(parent *Variant) MaxTimesThroughDeck(checkers ...Int32Checker) *Assertion {
+func (parent *Variant) MaxTimesThroughDeck(checkers ...Int32Checker) *Assertion {
 	parent.maxTimesThroughDeckCheckers = checkers
 	return parent.assertion
 }
 
-func(parent *Variant) CheckVariant(t *testing.T, desc string, val poc.Variant) {
-	for _, checker := range  parent.maxTimesThroughDeckCheckers {
-		checker.CheckInt32(t, desc + ".MaxTimesThroughDeck", val.MaxTimesThroughDeck)
+func (parent *Variant) CheckVariant(t *testing.T, desc string, val poc.Variant) {
+	for _, checker := range parent.maxTimesThroughDeckCheckers {
+		checker.CheckInt32(t, desc+".MaxTimesThroughDeck", val.MaxTimesThroughDeck)
 	}
 }
 
@@ -232,7 +228,7 @@ type PositionedCardArray1D struct {
 }
 
 func newPositionedCardArray1D(assertion *Assertion) PositionedCardArray1D {
-	return PositionedCardArray1D {
+	return PositionedCardArray1D{
 		assertion: assertion,
 		nth:       make(map[int]PositionedCard),
 		ForEach:   newPositionedCard(assertion),
@@ -275,7 +271,7 @@ type PositionedCardArray2D struct {
 }
 
 func newPositionedCardArray2D(assertion *Assertion) PositionedCardArray2D {
-	return PositionedCardArray2D {
+	return PositionedCardArray2D{
 		assertion: assertion,
 		nth:       make(map[int]PositionedCardArray1D),
 		ForEach:   newPositionedCardArray1D(assertion),

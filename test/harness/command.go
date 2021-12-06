@@ -25,9 +25,9 @@ type StartGame []struct {
 	Result  StartGameChecker
 }
 
-func (h StartGame) Run(t *testing.T){
+func (h StartGame) Run(t *testing.T) {
 	for _, testCase := range h {
-		t.Run(testCase.Desc, func(t *testing.T){
+		t.Run(testCase.Desc, func(t *testing.T) {
 			result, err := testCase.Command.CallStartGame(context.Background(), testCase.Input)
 			if testCase.Result != nil {
 				testCase.Result.CheckError(t, "", err)
@@ -49,9 +49,9 @@ type PerformMove []struct {
 	Result  PerformMoveChecker
 }
 
-func (h PerformMove) Run(t *testing.T){
+func (h PerformMove) Run(t *testing.T) {
 	for _, testCase := range h {
-		t.Run(testCase.Desc, func(t *testing.T){
+		t.Run(testCase.Desc, func(t *testing.T) {
 			result, err := testCase.Command.CallPerformMove(context.Background(), testCase.Input)
 			if testCase.Result != nil {
 				testCase.Result.CheckError(t, "", err)
@@ -73,9 +73,9 @@ type ListGames []struct {
 	Result  ListGamesChecker
 }
 
-func (h ListGames) Run(t *testing.T){
+func (h ListGames) Run(t *testing.T) {
 	for _, testCase := range h {
-		t.Run(testCase.Desc, func(t *testing.T){
+		t.Run(testCase.Desc, func(t *testing.T) {
 			result, err := testCase.Command.CallListGames(context.Background(), testCase.Input)
 			if testCase.Result != nil {
 				testCase.Result.CheckError(t, "", err)

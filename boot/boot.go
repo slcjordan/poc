@@ -46,7 +46,9 @@ func PGXConnect(connString string) *poolWrapper {
 
 // MustServe serves the api server and fatally exits on error.
 func MustServe(s *http.Server) {
-	logger.Infof(context.Background(), "Listening at %#v", s.Addr)
+	logger.WithValues{
+		"addr": s.Addr,
+	}.Infof(context.Background(), "Listening at %#v", s.Addr)
 	err := s.ListenAndServe()
 	if err != nil {
 		logger.Errorf(context.Background(), "while serving the api server: %s", err)

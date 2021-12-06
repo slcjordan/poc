@@ -168,9 +168,6 @@ build/assert: cmd/assert/main.go
 		--interactive \
 		--tty \
 		--network poc-demo \
-		--publish 8321:8321 \
-		--env DB_CONN_STRING=${DB_CONN_STRING} \
-		--env HTTP_LISTEN_ADDRESS=${HTTP_LISTEN_ADDRESS} \
 		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
 		--workdir /go/src/github.com/slcjordan/poc/cmd/assert \
 		golang:${GO_VERSION} go build -o ../../build/assert
@@ -180,9 +177,6 @@ build/harness: cmd/harness/main.go
 		--interactive \
 		--tty \
 		--network poc-demo \
-		--publish 8321:8321 \
-		--env DB_CONN_STRING=${DB_CONN_STRING} \
-		--env HTTP_LISTEN_ADDRESS=${HTTP_LISTEN_ADDRESS} \
 		--volume ${PWD}:/go/src/github.com/slcjordan/poc \
 		--workdir /go/src/github.com/slcjordan/poc/cmd/harness \
 		golang:${GO_VERSION} go build -o ../../build/harness

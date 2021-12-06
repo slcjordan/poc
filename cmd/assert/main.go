@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/token"
 	"io"
@@ -635,10 +637,19 @@ func main() {
 		log.Fatal(err)
 	}
 	defer file.Close()
+	unformatted := bytes.NewBuffer(nil)
 	for _, r := range readers {
-		_, err := io.Copy(file, r)
+		_, err := io.Copy(unformatted, r)
 		if err != nil {
 			log.Fatal(err)
 		}
+	}
+	formatted, err := format.Source(unformatted.Bytes())
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = io.Copy(file, bytes.NewReader(formatted))
+	if err != nil {
+		log.Fatal(err)
 	}
 }
