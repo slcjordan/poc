@@ -8,7 +8,8 @@ import (
 
 	"github.com/slcjordan/poc"
 	"github.com/slcjordan/poc/db"
-	"github.com/slcjordan/poc/test"
+	"github.com/slcjordan/poc/test/assert"
+	"github.com/slcjordan/poc/test/harness"
 	"github.com/slcjordan/poc/test/logger"
 	"github.com/slcjordan/poc/test/mocks"
 )
@@ -38,20 +39,20 @@ func NewSaveTestPool(t *testing.T, err error) *mocks.MockPool {
 
 func TestSave(t *testing.T) {
 	logger.RegisterVerbose(t)
-	test.StartGame{
+	harness.StartGame{
 		{
 			Desc: "sanity check",
 			Command: &db.Save{
 				NewSaveTestPool(t, nil),
 			},
-			Error: test.IsNil{},
+			Result: assert.New().NoError(),
 		},
 		{
 			Desc: "unknown query error",
 			Command: &db.Save{
 				NewSaveTestPool(t, errors.New("check that this error correctly causes the game to not be saved")),
 			},
-			Error: test.Category{Expected: poc.UnknownError},
+			Result: assert.New().Error.Category.Uint8(assert.Equals(poc.UnknownError)),
 		},
 	}.Run(t)
 }

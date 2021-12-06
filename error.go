@@ -1,5 +1,7 @@
 package poc
 
+//go:generate build/assert -filename=error.go
+
 // An ErrorCategory must be at least detailed enough to only correspond to a
 // single http status code, but may be broken down further (one-to-many).
 //go:generate stringer -type=ErrorCategory

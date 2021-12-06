@@ -1,6 +1,5 @@
 Toy proof-of-concept repo using "command" pattern
 ---
-(still under construction. Not much works yet... especially tests)
 
 ```
 make run-dev
@@ -16,7 +15,7 @@ The project root
 ---
 The types of "commands" for this project are simply interfaces stored in the
 root directory under `commands.go`. Commands manipulate service objects,
-defined in the same file.
+defined `service.go`.
 
 Domain entities are saved in a file called `model.go`. The structs in this file
 do not contain any struct tags as that would violate their purpose: to serve as
@@ -72,9 +71,10 @@ parent at import.
 
 Code generation
 ---
-Mocks, enum stringer methods, etc. are all generated using the `go:generate`
-comments. The test setup duplicates the logic in the `boot` package using mock
-dependencies. Since we've defined our dependencies as interfaces, we can use
-mock-generation libraries like `golang/mock` to generate that code.
+Mocks, enum stringer methods, test harnesses and test assertion helpers are all
+generated using the `go:generate` comments. The test setup duplicates the logic
+in the `boot` package using mock dependencies. Since we've defined our
+dependencies as interfaces, we can use mock-generation libraries like
+`golang/mock` to generate that code.
 
-Mocks are saved in the `test` directory.
+Mocks, harnesses and assertions are saved in the `test` directory.

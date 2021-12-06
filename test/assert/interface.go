@@ -2,6 +2,10 @@ package assert
 
 import "testing"
 
+type ErrorChecker interface {
+	CheckError(*testing.T, string, error)
+}
+
 type BoolChecker interface {
 	CheckBool(*testing.T, string, bool)
 }

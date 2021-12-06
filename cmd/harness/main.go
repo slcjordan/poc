@@ -43,7 +43,6 @@ type %s []struct {
 	Desc    string
 	Input   poc.%s
 	Command poc.%s
-	Error   ErrorChecker
 	Result  %sChecker
 }
 
@@ -51,10 +50,8 @@ func (h %s) Run(t *testing.T){
 	for _, testCase := range h {
 		t.Run(testCase.Desc, func(t *testing.T){
 			result, err := testCase.Command.%s(context.Background(), testCase.Input)
-			if testCase.Error != nil {
-				testCase.Error.CheckError(t, "error", err)
-			}
 			if testCase.Result != nil {
+				testCase.Result.CheckError(t, "", err)
 				testCase.Result.Check%s(t, "", result)
 			}
 		})
@@ -74,6 +71,7 @@ func (i Interface) WriteTo(w io.Writer) (int64, error) {
 	mw.Printf(`
 
 type %sChecker interface {
+	ErrorChecker
 	Check%s(*testing.T, string, poc.%s)
 }`, i.Type, i.Type, i.Type)
 	return mw.total, nil
