@@ -77,11 +77,13 @@ func APIServer(pool db.Pool) chi.Router {
 	return router.New(router.V1Handlers{
 		StartGame: logger.BytesMiddleware(handler.StartGame{
 			Encoding: json.V1{},
-			Command: logger.StartGameMiddleware(pipeline.StartGame{
+			Command: pipeline.StartGame{
 				rules.Shuffle{Source: rand.NewSource(time.Now().UnixNano())},
 				save,
 				rules.NextMove{},
-			}),
+			}.UseEach(
+				logger.Middleware{},
+			),
 		}),
 		PerformMove: handler.PerformMove{
 			Encoding: json.V1{},

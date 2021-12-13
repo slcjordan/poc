@@ -81,17 +81,15 @@ func (m Middleware) CallStartGame(ctx context.Context, input poc.StartGame) (poc
 	return m.NextStartGame.CallStartGame(context.WithValue(ctx, MiddlewareKey, val), input)
 }
 
+func (m Middleware) StartGameUse(next poc.StartGameCaller) poc.StartGameCaller {
+	m.NextStartGame = next
+	return m
+}
+
 // BytesMiddleware sets up sMiddlewareKeymiddleware.
 func BytesMiddleware(next ByteCaller) Middleware {
 	return Middleware{
 		NextBytes: next,
-	}
-}
-
-// StartGameMiddleware sets up start-game middleware.
-func StartGameMiddleware(next poc.StartGameCaller) Middleware {
-	return Middleware{
-		NextStartGame: next,
 	}
 }
 

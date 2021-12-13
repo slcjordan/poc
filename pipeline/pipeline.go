@@ -25,6 +25,21 @@ func (ppipe PerformMove) CallPerformMove(ctx context.Context, p poc.PerformMove)
 	return p, nil
 }
 
+type PerformMoveMiddleware interface {
+	PerformMoveUse(poc.PerformMoveCaller) poc.PerformMoveCaller
+}
+
+// Use middleware to wrap each command.
+func (ppipe PerformMove) UseEach(middleware ...PerformMoveMiddleware) PerformMove {
+	result := make([]poc.PerformMoveCaller, len(ppipe))
+	for _, step := range ppipe {
+		for _, mw := range middleware {
+			result = append(result, mw.PerformMoveUse(step))
+		}
+	}
+	return result
+}
+
 // StartGame uses the same context for every command, but uses the
 // startGame output from the previous command as input to the next command.
 type StartGame []poc.StartGameCaller
@@ -40,6 +55,21 @@ func (spipe StartGame) CallStartGame(ctx context.Context, s poc.StartGame) (poc.
 		}
 	}
 	return s, nil
+}
+
+type StartGameMiddleware interface {
+	StartGameUse(poc.StartGameCaller) poc.StartGameCaller
+}
+
+// Use middleware to wrap each command.
+func (spipe StartGame) UseEach(middleware ...StartGameMiddleware) StartGame {
+	result := make([]poc.StartGameCaller, len(spipe))
+	for _, step := range spipe {
+		for _, mw := range middleware {
+			result = append(result, mw.StartGameUse(step))
+		}
+	}
+	return result
 }
 
 // ListGames uses the same context for every command, but uses the
@@ -58,3 +88,19 @@ func (lpipe ListGames) CallListGames(ctx context.Context, l poc.ListGames) (poc.
 	}
 	return l, nil
 }
+
+type ListGamesMiddleware interface {
+	ListGamesUse(poc.ListGamesCaller) poc.ListGamesCaller
+}
+
+// Use middleware to wrap each command.
+func (lpipe ListGames) UseEach(middleware ...ListGamesMiddleware) ListGames {
+	result := make([]poc.ListGamesCaller, len(lpipe))
+	for _, step := range lpipe {
+		for _, mw := range middleware {
+			result = append(result, mw.ListGamesUse(step))
+		}
+	}
+	return result
+}
+
