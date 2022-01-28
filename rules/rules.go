@@ -343,3 +343,5 @@ func (s Shuffle) CallStartGame(ctx context.Context, game poc.StartGame) (poc.Sta
 	game.SavedGameDetail.Board.Piles[0] = cards[28:]
 	return game, nil
 }
+
+type FindError struct{}

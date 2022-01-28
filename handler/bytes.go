@@ -19,7 +19,7 @@ type StartGameEncoding interface {
 // StartGame command turns a startGame command (usually a pipeline) into a []byte command.
 type StartGame struct {
 	Encoding StartGameEncoding
-	Command  poc.StartGameCaller
+	Pipeline poc.StartGameCaller
 }
 
 // CallBytes forwards parsed bytes to the StartGame command.
@@ -28,7 +28,7 @@ func (s StartGame) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	if err != nil {
 		return nil, poc.Error{Actual: fmt.Errorf("could not decode request: %w", err), Category: poc.MalformedError}
 	}
-	game, err = s.Command.CallStartGame(ctx, game)
+	game, err = s.Pipeline.CallStartGame(ctx, game)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ type PerformMoveEncoding interface {
 // PerformMove command turns a performMove command (usually a pipeline) into a []byte command.
 type PerformMove struct {
 	Encoding PerformMoveEncoding
-	Command  poc.PerformMoveCaller
+	Pipeline poc.PerformMoveCaller
 }
 
 // CallBytes forwards parsed bytes to the PerformMove command.
@@ -59,7 +59,7 @@ func (p PerformMove) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	if err != nil {
 		return nil, poc.Error{Actual: fmt.Errorf("could not decode request: %w", err), Category: poc.MalformedError}
 	}
-	move, err = p.Command.CallPerformMove(ctx, move)
+	move, err = p.Pipeline.CallPerformMove(ctx, move)
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +78,10 @@ type ListGamesEncoding interface {
 	DecodeListGames([]byte) (poc.ListGames, error)
 }
 
-// ListGames command turns a listGames command (usually a pipeline) into a []byte command.
+//Pipelinemes command turns a listGames command (usually a pipeline) into a []byte command.
 type ListGames struct {
 	Encoding ListGamesEncoding
-	Command  poc.ListGamesCaller
+	Pipeline poc.ListGamesCaller
 }
 
 // CallBytes forwards parsed bytes to the ListGames command.
@@ -90,7 +90,7 @@ func (l ListGames) CallBytes(ctx context.Context, b []byte) ([]byte, error) {
 	if err != nil {
 		return nil, poc.Error{Actual: fmt.Errorf("could not decode request: %w", err), Category: poc.MalformedError}
 	}
-	list, err = l.Command.CallListGames(ctx, list)
+	list, err = l.Pipeline.CallListGames(ctx, list)
 	if err != nil {
 		return nil, err
 	}

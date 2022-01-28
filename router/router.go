@@ -31,9 +31,9 @@ type ByteCaller interface {
 
 // V1Handlers members must not be nil.
 type V1Handlers struct {
-	StartGame   ByteCaller
-	PerformMove ByteCaller
-	ListGames   ByteCaller
+	PostGameStart    ByteCaller
+	PostGameByIDMove ByteCaller
+	GetGameList      ByteCaller
 }
 
 // New sets up routes with passed middleware.
@@ -42,9 +42,9 @@ func New(
 	middlewares ...func(http.Handler) http.Handler,
 ) chi.Router {
 	router := chi.NewRouter().With(middlewares...)
-	router.Post("/v1/game/start", handlerFunc(v1.StartGame))
-	router.Post(fmt.Sprintf("/v1/game/{%s}/move", gameIDKey), handlerFunc(v1.PerformMove))
-	router.Get("/v1/game/list", handlerFunc(v1.ListGames))
+	router.Post("/v1/game/start", handlerFunc(v1.PostGameStart))
+	router.Post(fmt.Sprintf("/v1/game/{%s}/move", gameIDKey), handlerFunc(v1.PostGameByIDMove))
+	router.Get("/v1/game/list", handlerFunc(v1.GetGameList))
 	return router
 }
 
