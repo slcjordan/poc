@@ -87,7 +87,7 @@ func APIServer(pool db.Pool) chi.Router {
 		}),
 		PostGameByIDMove: handler.PerformMove{
 			Encoding: json.V1{},
-			Command: pipeline.PerformMove{
+			Pipeline: pipeline.PerformMove{
 				v1HydrateParams,
 				lookup,
 				rules.Validate{},
@@ -97,7 +97,7 @@ func APIServer(pool db.Pool) chi.Router {
 		},
 		GetGameList: handler.ListGames{
 			Encoding: json.V1{},
-			Command: pipeline.ListGames{
+			Pipeline: pipeline.ListGames{
 				v1HydrateParams,
 				search,
 			},

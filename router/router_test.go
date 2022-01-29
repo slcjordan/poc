@@ -46,9 +46,9 @@ func checkSaveErrorCode(method string, path string, category poc.ErrorCategory, 
 		ctrl := gomock.NewController(t)
 		command := mocks.NewMockByteCaller(ctrl)
 		mux := router.New(router.V1Handlers{
-			StartGame:   command,
-			PerformMove: command,
-			ListGames:   command,
+			PostGameStart:    command,
+			PostGameByIDMove: command,
+			GetGameList:      command,
 		})
 		command.
 			EXPECT().
