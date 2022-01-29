@@ -75,7 +75,7 @@ func APIServer(pool db.Pool) chi.Router {
 	lookup := &db.Lookup{Pool: pool}
 
 	return router.New(router.V1Handlers{
-		PostGameStart: logger.BytesMiddleware(handler.StartGame{
+		PostGameStart: handler.StartGame{
 			Encoding: json.V1{},
 			Pipeline: pipeline.StartGame{
 				rules.Shuffle{Source: rand.NewSource(time.Now().UnixNano())},
@@ -84,7 +84,7 @@ func APIServer(pool db.Pool) chi.Router {
 			}.UseEach(
 				logger.Middleware{},
 			),
-		}),
+		},
 		PostGameByIDMove: handler.PerformMove{
 			Encoding: json.V1{},
 			Pipeline: pipeline.PerformMove{
