@@ -55,7 +55,7 @@ response bodies, translating errors into http error codes.
 
 Dependency Setup
 ---
-Commands are stored in packages under the `cmd` folder but they hold very
+Executables are stored in packages under the `cmd` folder but they hold very
 little logic.  The heavy lifting of dependency setup and pipeline definition is
 done in the `boot` package.
 
