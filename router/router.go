@@ -12,7 +12,20 @@ import (
 
 	chi "github.com/go-chi/chi/v5"
 	"github.com/slcjordan/poc"
+	"github.com/slcjordan/poc/config"
 )
+
+func init() {
+	config.ValidateFunc(func() error {
+		_, err := url.Parse(config.HTTP.ListenAddress)
+		if err != nil {
+			return poc.Error{
+				err,
+			}
+		}
+		return nil
+	})
+}
 
 type key string
 
