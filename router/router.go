@@ -19,9 +19,7 @@ func init() {
 	config.ValidateFunc(func() error {
 		_, err := url.Parse(config.HTTP.ListenAddress)
 		if err != nil {
-			return poc.Error{
-				err,
-			}
+			return err
 		}
 		return nil
 	})
